@@ -1,0 +1,15 @@
+#!/bin/bash
+
+if [ "$(uname)" == "Darwin" ]; then
+    # Is Mac OS X platform
+    export IP_HOST=192.168.33.10
+elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
+    # Is GNU/Linux platform
+    export IP_HOST=$(ip address show|grep inet|grep eth0|awk '{print($2)}'|awk -F '/' '{print($1)}')
+fi
+
+echo "IP_HOST : $IP_HOST"
+
+export HIKARI_DATASOURCE_PROPERTY_FILE_NAME=some/path/dao-test.properties
+
+./sbt -v -213
