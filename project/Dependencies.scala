@@ -8,6 +8,7 @@ object Dependencies {
   lazy val scalatest = "org.scalatest" %% "scalatest" % "3.0.8" % "test"
   lazy val hikariCP = "com.zaxxer" % "HikariCP" % "3.2.0"
   lazy val mariadbJavaClient = "org.mariadb.jdbc" % "mariadb-java-client" % "2.3.0"
+
   //
   lazy val fragnosticConf = "com.fragnostic" % "fragnostic-conf_2.13" % "0.1.9.1-BETA"
   lazy val fragnosticSupport = "com.fragnostic" % "fragnostic-support_2.13" % "0.1.10.1-BETA"

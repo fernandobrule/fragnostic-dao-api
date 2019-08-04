@@ -2,14 +2,16 @@
 
 if [ "$(uname)" == "Darwin" ]; then
     # Is Mac OS X platform
-    export IP_HOST=192.168.33.10
+    export IP_DB=192.168.33.10
 elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
     # Is GNU/Linux platform
-    export IP_HOST=$(ip address show|grep inet|grep eth0|awk '{print($2)}'|awk -F '/' '{print($1)}')
+    export IP_DB=$(ip address show|grep inet|grep eth0|awk '{print($2)}'|awk -F '/' '{print($1)}')
 fi
 
-echo "IP_HOST : $IP_HOST"
+echo ""
+echo "IP_DB : $IP_DB"
+echo ""
 
-export HIKARI_DATASOURCE_PROPERTY_FILE_NAME=some/path/dao-test.properties
+export HIKARI_DATASOURCE_PROPERTY_FILE_NAME=fragnostic-dao/src/test/resources/fragnostic-dao-test.properties
 
 ./sbt -v -213
