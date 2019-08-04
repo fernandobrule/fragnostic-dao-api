@@ -20,7 +20,7 @@ trait CreateAgnostic extends ConnectionAgnostic with PreparedStatementSupport wi
     createRequest: R,
     sqlCreate: String,
     filloutPsCreate: (PreparedStatement, R) => Either[String, PreparedStatement],
-    resultSetExtractId: (ResultSet) => I): Either[String, I] =
+    resultSetExtractId: ResultSet => I): Either[String, I] =
     getConnection map (
       connection =>
         create(
@@ -47,7 +47,7 @@ trait CreateAgnostic extends ConnectionAgnostic with PreparedStatementSupport wi
     createRequest: R,
     sqlCreate: String,
     filloutPsCreate: (PreparedStatement, R) => Either[String, PreparedStatement],
-    resultSetExtractId: (ResultSet) => I): Either[String, I] = {
+    resultSetExtractId: ResultSet => I): Either[String, I] = {
 
     if (logger.isInfoEnabled) logger.info(s"create|enter, \n\t- $createRequest\n\t- $sqlCreate")
     val prepStat =

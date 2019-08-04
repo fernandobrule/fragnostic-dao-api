@@ -1,7 +1,6 @@
 package com.fragnostic.dao.impl
 
 import java.sql.SQLNonTransientConnectionException
-import java.util.Properties
 
 import com.fragnostic.conf.service.CakeServiceConf
 import com.fragnostic.dao.api.DataSourceApi

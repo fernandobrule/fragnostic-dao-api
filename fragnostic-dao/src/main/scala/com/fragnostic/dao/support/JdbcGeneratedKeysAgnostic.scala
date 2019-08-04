@@ -18,7 +18,7 @@ trait JdbcGeneratedKeysAgnostic extends CloseResourceAgnostic {
 
   def getGenKey[T](
     prepStat: PreparedStatement,
-    resultSetExtract: (ResultSet) => T): Option[T] =
+    resultSetExtract: ResultSet => T): Option[T] =
     Try({
       val resultSet = prepStat.getGeneratedKeys
       resultSet.next()
