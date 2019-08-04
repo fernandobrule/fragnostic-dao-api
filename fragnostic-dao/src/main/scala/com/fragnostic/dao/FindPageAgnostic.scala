@@ -112,7 +112,7 @@ trait FindPageAgnostic extends ConnectionAgnostic with PreparedStatementSupport 
               if (logger.isInfoEnabled) logger.info(
                 s"findPageCountTotalRows | totalRows: 0, empty set...")
               close(resultSet, prepStat)
-              Right(0, "", 0, 0, Nil, 0, 0, 0, Nil, true)
+              Right((0, "", 0, 0, Nil, 0, 0, 0, Nil, true): (Long, String, Long, Long, List[Int], Long, Long, Long, List[P], Boolean))
             }
           })
       })
@@ -184,7 +184,7 @@ trait FindPageAgnostic extends ConnectionAgnostic with PreparedStatementSupport 
               list =>
                 if (list.nonEmpty) {
                   val linksLimits = getPageLinks(numPage, numPages, nummaxBadgets)
-                  Right(
+                  Right((
                     numPage,
                     orderBy,
                     linksLimits._1,
@@ -194,8 +194,8 @@ trait FindPageAgnostic extends ConnectionAgnostic with PreparedStatementSupport 
                     numRows,
                     numPages,
                     list,
-                    list.isEmpty)
-                } else Right(0, "", 0, 0, Nil, 0, 0, 0, Nil, true))
+                    list.isEmpty): (Long, String, Long, Long, List[Int], Long, Long, Long, List[P], Boolean))
+                } else Right((0, "", 0, 0, Nil, 0, 0, 0, Nil, true): (Long, String, Long, Long, List[Int], Long, Long, Long, List[P], Boolean)))
           })
 
       })

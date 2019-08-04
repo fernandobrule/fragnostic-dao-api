@@ -1,11 +1,11 @@
 package com.fragnostic.dao
 
-import com.fragnostic.dao.impl.DataSourceImpl
+import com.fragnostic.dao.impl.HikariDataSourceImpl
 
 object CakeDao {
 
-  lazy val dataSourcePiece = new DataSourceImpl {}
+  lazy val hikariDataSourcePiece = new HikariDataSourceImpl {}
 
-  val dataSource = dataSourcePiece.dataSource
+  val hikariDataSource = hikariDataSourcePiece.dataSource
 
 }
