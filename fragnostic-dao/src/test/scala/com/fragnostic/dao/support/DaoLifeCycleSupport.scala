@@ -9,13 +9,13 @@ trait DaoLifeCycleSupport extends FunSpec with Matchers with BeforeAndAfterAll {
 
   private def logger: Logger = LoggerFactory.getLogger(getClass)
 
-  val dataSource: HikariDataSource = CakeDao.dataSource.getDataSource() fold (
+  val dataSource: HikariDataSource = CakeDao.hikariDataSource.getDataSource() fold (
     error => throw new IllegalStateException(error),
     dataSource => dataSource)
 
-  override def afterAll() {
+  override def afterAll(): Unit = {
     dataSource.close()
-    logger.info(s"afterAll() - DataSource has been closed")
+    if (logger.isInfoEnabled) logger.info(s"afterAll() - DataSource has been closed")
   }
 
 }

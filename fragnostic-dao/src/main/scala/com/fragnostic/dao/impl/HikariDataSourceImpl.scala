@@ -1,7 +1,6 @@
 package com.fragnostic.dao.impl
 
 import java.sql.SQLNonTransientConnectionException
-import java.util.Properties
 
 import com.fragnostic.conf.service.CakeServiceConf
 import com.fragnostic.dao.api.DataSourceApi
@@ -10,7 +9,7 @@ import com.zaxxer.hikari.pool.HikariPool.PoolInitializationException
 import com.zaxxer.hikari.{ HikariConfig, HikariDataSource }
 import org.slf4j.{ Logger, LoggerFactory }
 
-trait DataSourceImpl extends DataSourceApi {
+trait HikariDataSourceImpl extends DataSourceApi {
 
   def dataSource = new DefaultDataSource
 
@@ -18,19 +17,20 @@ trait DataSourceImpl extends DataSourceApi {
 
     private def logger: Logger = LoggerFactory.getLogger(getClass.getName)
 
-    private val regex = """\{\{(\w+)\}\}""".r
+    private val HIKARI_DATASOURCE_PROPERTY_FILE_NAME = "HIKARI_DATASOURCE_PROPERTY_FILE_NAME"
+    private val REGEX_ENVAR = """\{\{(\w+)\}\}""".r
 
     private def isEnvar(value: String): Option[String] =
       value match {
-        case regex(envar) => Some(envar)
+        case REGEX_ENVAR(envar) => Some(envar)
         case _ => None
       }
 
     override def getDataSource(): Either[String, HikariDataSource] =
-      CakeServiceConf.confService.getConf("HIKARI_DATASOURCE_PROPERTY_FILE_NAME").fold(
+      CakeServiceConf.confService.getConf(HIKARI_DATASOURCE_PROPERTY_FILE_NAME).fold(
         error => {
           logger.error(s"getDataSource() - ERROR al cargar propertyFileName, $error")
-          Left("fragnostic.dao.error.on.get.template")
+          Left("hikari.datasource.impl.get.datasource.on.get.conf")
         },
         propertyFileName => {
 
@@ -39,7 +39,7 @@ trait DataSourceImpl extends DataSourceApi {
           loadProperties(propertyFileName) fold (
             error => {
               logger.error(s"getDataSource() - ERROR al leer archivo de propiedades, $error")
-              Left("fragnostic.dao.error.on.load.properties")
+              Left("hikari.datasource.impl.get.datasource.on.load.properties")
             },
             props => {
 
@@ -48,11 +48,12 @@ trait DataSourceImpl extends DataSourceApi {
 
                 val key = propNamesEnum.nextElement().toString
                 val value = props.getProperty(key)
+                if (logger.isInfoEnabled) logger.info(s"getDataSource() - key/value: $key => $value")
                 isEnvar(value) map (
                   envar => CakeServiceConf.confService.getConf(envar) fold (
-                    error => throw new IllegalStateException(s"fragnostic.dao.error.envar.do.not.exists.$envar"),
+                    error => throw new IllegalStateException(s"hikari.datasource.impl.get.datasource.on.get.conf.$envar"),
                     realValue => {
-                      if (logger.isInfoEnabled) logger.info(s"getDataSoutce() - $envar => $realValue")
+                      if (logger.isInfoEnabled) logger.info(s"getDataSoutce() - envar/realValue: $envar => $realValue")
                       props.put(key, realValue)
                     }))
 
@@ -66,23 +67,21 @@ trait DataSourceImpl extends DataSourceApi {
                 //dataSource.portNumber
                 //dataSource.serverName
                 val config = new HikariConfig(props)
+                if (logger.isInfoEnabled) logger.info(s"getDataSource() - about to instantiate HikariDataSource")
                 Right(new HikariDataSource(config))
               } catch {
                 case e: PoolInitializationException =>
                   logger.error("getDataSource() - PoolInitializationException, {}", e.getMessage)
-                  Left("fragnostic.dao.error.on.get.datasource")
+                  Left("hikari.datasource.impl.get.datasource.on.get.datasource")
                 case e: SQLNonTransientConnectionException =>
                   logger.error("getDataSource() - SQLNonTransientConnectionException, {}", e.getMessage)
-                  Left("fragnostic.dao.error.on.get.datasource")
+                  Left("hikari.datasource.impl.get.datasource.on.get.datasource")
                 case e: Throwable =>
                   logger.error("getDataSource() - Throwable, {}", e.getMessage)
-                  Left("fragnostic.dao.error.on.get.datasource")
+                  Left("hikari.datasource.impl.get.datasource.on.get.datasource")
               }
-
             })
-
         })
-
   }
 
 }

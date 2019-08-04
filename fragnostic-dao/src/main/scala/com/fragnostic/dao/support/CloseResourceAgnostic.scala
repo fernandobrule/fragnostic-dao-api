@@ -78,7 +78,7 @@ trait CloseResourceAgnostic {
           s"close.resource.agnostic.error.close.statement (${e.getMessage})")
     }
 
-  def close(resultSet: ResultSet, prepStat: PreparedStatement) {
+  def close(resultSet: ResultSet, prepStat: PreparedStatement): Unit = {
     close(resultSet)
     close(prepStat)
   }
