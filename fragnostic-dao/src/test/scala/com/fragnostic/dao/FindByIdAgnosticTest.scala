@@ -51,9 +51,13 @@ class FindByIdAgnosticTest extends DaoLifeCycleSupport with FindByIdAgnostic {
         Left("fragnostic.dao.test.error.ps.fillout.throwable")
     }
 
-  def newCodeName = (rs: ResultSet) => CodeName(
-    rs.getString("test_code"),
-    rs.getString("test_name"))
+  def newCodeName = (rs: ResultSet) => try {
+    Right(CodeName(
+      rs.getString("test_code"),
+      rs.getString("test_name")))
+  } catch {
+    case e: Exception => Left(e.getMessage)
+  }
 
   describe("Find By Id Agnostic Test") {
 

@@ -13,7 +13,7 @@ trait SuggestAgnostic extends ConnectionAgnostic with CloseResourceAgnostic with
 
   private def logger = LoggerFactory.getLogger(getClass.getName)
 
-  def suggestBy[S](query: String, sqlSuggest: String, limit: Int, newSuggest: ResultSet => S): Either[String, List[S]] =
+  def suggestBy[S](query: String, sqlSuggest: String, limit: Int, newSuggest: ResultSet => Either[String, S]): Either[String, List[S]] =
     getConnection map (connection =>
       try {
         // TODO this try
