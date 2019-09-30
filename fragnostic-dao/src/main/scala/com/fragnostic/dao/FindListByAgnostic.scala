@@ -3,14 +3,14 @@ package com.fragnostic.dao
 import java.sql.{ Connection, PreparedStatement, ResultSet }
 
 import com.fragnostic.dao.support.{ ConnectionAgnostic, PreparedStatementSupport, RecursionSupport }
-import org.slf4j.LoggerFactory
+import org.slf4j.{ Logger, LoggerFactory }
 
 /**
  * Created by fernandobrule on 8/20/16.
  */
 trait FindListByAgnostic extends ConnectionAgnostic with PreparedStatementSupport with RecursionSupport {
 
-  private def logger = LoggerFactory.getLogger(getClass.getName)
+  private[this] val logger: Logger = LoggerFactory.getLogger(getClass.getName)
 
   //
   // Find List By Id
@@ -19,7 +19,7 @@ trait FindListByAgnostic extends ConnectionAgnostic with PreparedStatementSuppor
     parameter: P,
     sqlFindListBy: String,
     filloutPsFindListBy: (PreparedStatement, P) => Either[String, PreparedStatement],
-    newEntity: ResultSet => T): Either[String, List[T]] =
+    newEntity: ResultSet => Either[String, T]): Either[String, List[T]] =
     getConnection map (
       connection =>
         findListBy(
@@ -45,7 +45,7 @@ trait FindListByAgnostic extends ConnectionAgnostic with PreparedStatementSuppor
     parameter: P,
     sqlFindListBy: String,
     filloutPsFindListBy: (PreparedStatement, P) => Either[String, PreparedStatement],
-    newEntity: ResultSet => T): Either[String, List[T]] =
+    newEntity: ResultSet => Either[String, T]): Either[String, List[T]] =
     prepareStatement(connection, sqlFindListBy) fold (
       error => {
         logger.error(

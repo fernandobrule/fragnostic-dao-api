@@ -2,7 +2,7 @@ package com.fragnostic.dao.support
 
 import java.sql.{ PreparedStatement, ResultSet }
 
-import scala.util.Try
+import org.slf4j.{ Logger, LoggerFactory }
 
 /**
  * Created by Fernando Brule on 30-06-2015 22:23:00.
@@ -10,29 +10,46 @@ import scala.util.Try
  */
 trait JdbcGeneratedKeysAgnostic extends CloseResourceAgnostic {
 
-  def getLongGenKey(
-    prepStat: PreparedStatement): Option[Long] =
+  private[this] val logger: Logger = LoggerFactory.getLogger(getClass.getName)
+
+  def getLongGenKey(prepStat: PreparedStatement): Option[Long] =
     getGenKey[Long](
       prepStat,
-      (resultSet: ResultSet) => resultSet.getLong(1))
+      (resultSet: ResultSet) => try {
+        Right(resultSet.getLong(1))
+      } catch {
+        case e: Exception =>
+          logger.error(s"getLongGenKey() - $e")
+          Left("jdbc.generated.keys.agnostic.get.long.gen.key.error")
+      })
 
   def getGenKey[T](
     prepStat: PreparedStatement,
-    resultSetExtract: ResultSet => T): Option[T] =
-    Try({
+    resultSetExtract: ResultSet => Either[String, T]): Option[T] =
+    {
       val resultSet = prepStat.getGeneratedKeys
       resultSet.next()
-      val id = resultSetExtract(resultSet)
-      close(resultSet)
-      id
-    }).toOption
+      resultSetExtract(resultSet) fold (
+        error => {
+          logger.error(s"getGenKey() - $error")
+          None
+        },
+        genKey => {
+          close(resultSet)
+          Some(genKey)
+        })
+    }
 
   def getIntGenKey(
     prepStat: PreparedStatement): Option[Int] =
     getGenKey[Int](
       prepStat,
-      (resultSet: ResultSet) => {
-        resultSet.getInt(1)
+      (resultSet: ResultSet) => try {
+        Right(resultSet.getInt(1))
+      } catch {
+        case e: Exception =>
+          logger.error(s"getIntGenKey() - $e")
+          Left("jdbc.generated.keys.agnostic.get.int.gen.key.error")
       })
 
 }

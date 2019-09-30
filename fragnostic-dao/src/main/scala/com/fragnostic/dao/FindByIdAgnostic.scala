@@ -3,7 +3,7 @@ package com.fragnostic.dao
 import java.sql.{ Connection, PreparedStatement, ResultSet }
 
 import com.fragnostic.dao.support.{ ConnectionAgnostic, PreparedStatementSupport }
-import org.slf4j.LoggerFactory
+import org.slf4j.{ Logger, LoggerFactory }
 
 /**
  * Created by Fernando Brule on 30-06-2015 22:23:00.
@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory
  */
 trait FindByIdAgnostic extends ConnectionAgnostic with PreparedStatementSupport {
 
-  private def logger = LoggerFactory.getLogger(getClass.getName)
+  private[this] val logger: Logger = LoggerFactory.getLogger(getClass.getName)
 
   //
   // Find By Id
@@ -20,7 +20,7 @@ trait FindByIdAgnostic extends ConnectionAgnostic with PreparedStatementSupport 
     entityId: I,
     sqlFindById: String,
     filloutPsFindById: (PreparedStatement, I) => Either[String, PreparedStatement],
-    newEntity: ResultSet => T): Either[String, Option[T]] =
+    newEntity: ResultSet => Either[String, T]): Either[String, Option[T]] =
     getConnection map (connection =>
       findById(
         connection,
@@ -45,7 +45,7 @@ trait FindByIdAgnostic extends ConnectionAgnostic with PreparedStatementSupport 
     entityId: I,
     sqlFindById: String,
     filloutPsFindById: (PreparedStatement, I) => Either[String, PreparedStatement],
-    newEntity: ResultSet => T): Either[String, Option[T]] = {
+    newEntity: ResultSet => Either[String, T]): Either[String, Option[T]] = {
 
     val prepStat = connection.prepareStatement(sqlFindById)
     filloutPsFindById(prepStat, entityId) fold (
@@ -61,21 +61,19 @@ trait FindByIdAgnostic extends ConnectionAgnostic with PreparedStatementSupport 
           },
           resultSet =>
             if (resultSet.next()) {
-              try {
-                val entity = newEntity(resultSet)
-                close(resultSet, prepStat)
-                Right(Some(entity))
-              } catch {
-                case e: Exception => {
-                  logger.error(s"findById|$e")
-                  Left(e.getMessage)
-                }
-              }
+              newEntity(resultSet) fold (
+                error => {
+                  logger.error(s"findById() - $error")
+                  Left(error)
+                },
+                entity => {
+                  close(resultSet, prepStat)
+                  Right(Some(entity))
+                })
             } else {
               close(resultSet, prepStat)
               Right(None)
             }))
-
   }
 
 }

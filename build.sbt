@@ -46,6 +46,7 @@ lazy val fragnosticProject = Project(
     name := "fragnostic-dao",
     artifacts := Classpaths.artifactDefs(Seq(packageDoc in Compile, makePom in Compile)).value,
     packagedArtifacts := Classpaths.packaged(Seq(packageDoc in Compile, makePom in Compile)).value,
+    updateOptions := updateOptions.value.withLatestSnapshots(false),
     description := "fragnostic-dao",
     shellPrompt := { state =>
       s"sbt:${Project.extract(state).currentProject.id}" + Def.withColor("> ", Option(scala.Console.CYAN))

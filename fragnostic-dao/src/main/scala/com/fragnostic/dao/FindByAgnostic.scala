@@ -1,9 +1,9 @@
 package com.fragnostic.dao
 
-import java.sql.{ Connection, PreparedStatement, ResultSet, SQLException }
+import java.sql.{ Connection, PreparedStatement, ResultSet }
 
 import com.fragnostic.dao.support.{ CloseResourceAgnostic, ConnectionAgnostic, PreparedStatementSupport }
-import org.slf4j.LoggerFactory
+import org.slf4j.{ Logger, LoggerFactory }
 
 /**
  * Created by Fernando Brule on 30-06-2015 22:23:00.
@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory
  */
 trait FindByAgnostic extends ConnectionAgnostic with CloseResourceAgnostic with PreparedStatementSupport {
 
-  private def logger = LoggerFactory.getLogger(getClass.getName)
+  private[this] val logger: Logger = LoggerFactory.getLogger(getClass.getName)
 
   //
   // Find By
@@ -20,7 +20,7 @@ trait FindByAgnostic extends ConnectionAgnostic with CloseResourceAgnostic with 
     parameter: P,
     sqlFindBy: String,
     filloutPsFindBy: (PreparedStatement, P) => Either[String, PreparedStatement],
-    newEntity: ResultSet => T): Either[String, Option[T]] =
+    newEntity: ResultSet => Either[String, T]): Either[String, Option[T]] =
     getConnection map (connection =>
       findBy(
         connection,
@@ -45,7 +45,7 @@ trait FindByAgnostic extends ConnectionAgnostic with CloseResourceAgnostic with 
     parameter: P,
     sqlFindBy: String,
     filloutPsFindBy: (PreparedStatement, P) => Either[String, PreparedStatement],
-    newEntity: ResultSet => T) =
+    newEntity: ResultSet => Either[String, T]) =
     prepareStatement(connection, sqlFindBy) fold (
       error => {
         logger.error(s"findBy | error on prepareStatement - $error")
@@ -66,26 +66,19 @@ trait FindByAgnostic extends ConnectionAgnostic with CloseResourceAgnostic with 
                 Left("find.by.agnostic.error.3")
               },
               resultSet =>
-                try {
-                  if (resultSet.next()) {
-                    val entity = newEntity(resultSet)
-                    close(resultSet, prepStat)
-                    Right(Some(entity))
-                  } else {
-                    close(resultSet, prepStat)
-                    Right(None)
-                  }
-                } catch {
-                  case e: SQLException => {
-                    close(resultSet, prepStat)
-                    logger.error(s"findBy | error on resultSet - $e")
-                    Left("find.by.agnostic.error.4")
-                  }
-                  case e: Throwable => {
-                    close(resultSet, prepStat)
-                    logger.error(s"findBy | error on resultSet - $e")
-                    Left("find.by.agnostic.error.5")
-                  }
+                if (resultSet.next()) {
+                  newEntity(resultSet) fold (
+                    error => {
+                      logger.error(s"findBy() - $error")
+                      Left("find.by.agnostic.error.4")
+                    },
+                    entity => {
+                      close(resultSet, prepStat)
+                      Right(Some(entity))
+                    })
+                } else {
+                  close(resultSet, prepStat)
+                  Right(None)
                 })))
 
 }
