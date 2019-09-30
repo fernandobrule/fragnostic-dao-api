@@ -1,16 +1,16 @@
 package com.fragnostic.dao
 
-import java.sql.{ Connection, ResultSet, SQLException }
+import java.sql.{ Connection, ResultSet }
 
 import com.fragnostic.dao.support.{ ConnectionAgnostic, PreparedStatementSupport, RecursionSupport }
-import org.slf4j.LoggerFactory
+import org.slf4j.{ Logger, LoggerFactory }
 
 /**
  * Created by fernandobrule on 7/21/16.
  */
 trait FindListAgnostic extends ConnectionAgnostic with PreparedStatementSupport with RecursionSupport {
 
-  private def logger = LoggerFactory.getLogger(getClass.getName)
+  private[this] val logger: Logger = LoggerFactory.getLogger(getClass.getName)
 
   //
   // Find List By Id

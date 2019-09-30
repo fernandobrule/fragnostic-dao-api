@@ -2,7 +2,7 @@ package com.fragnostic.dao.support
 
 import java.sql.PreparedStatement
 
-import org.slf4j.LoggerFactory
+import org.slf4j.{ Logger, LoggerFactory }
 
 /**
  * Created by Fernando Brule on 30-06-2015 22:23:00.
@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory
  */
 trait FilloutPreparedStatementAgnostic {
 
-  private def logger = LoggerFactory.getLogger(getClass.getName)
+  private[this] val logger: Logger = LoggerFactory.getLogger(getClass.getName)
 
   def filloutPsWithString =
     (prepStat: PreparedStatement, value: String) =>
@@ -93,6 +93,21 @@ trait FilloutPreparedStatementAgnostic {
           logger.error(s"$e")
           Left("fillout.prepstat.agnostic.with.int.int.error")
         }
+      }
+
+  def filloutPsWithIntLong =
+    (prepStat: PreparedStatement, req: (Int, Long)) =>
+      try {
+        prepStat.setInt(1, req._1)
+        prepStat.setLong(2, req._2)
+        Right(prepStat)
+      } catch {
+        case e: Exception =>
+          logger.error(s"$e")
+          Left("fillout.prepstat.agnostic.with.int.long.error")
+        case e: Throwable =>
+          logger.error(s"$e")
+          Left("fillout.prepstat.agnostic.with.int.long.error")
       }
 
   def filloutPsWithLong =

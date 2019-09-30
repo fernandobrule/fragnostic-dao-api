@@ -3,7 +3,7 @@ package com.fragnostic.dao
 import java.sql.{ ResultSet, SQLException }
 
 import com.fragnostic.dao.support.{ CloseResourceAgnostic, ConnectionAgnostic, RecursionSupport }
-import org.slf4j.LoggerFactory
+import org.slf4j.{ Logger, LoggerFactory }
 
 /**
  * Created by Fernando Brule on 30-06-2015 22:23:00.
@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory
  */
 trait SuggestAgnostic extends ConnectionAgnostic with CloseResourceAgnostic with RecursionSupport {
 
-  private def logger = LoggerFactory.getLogger(getClass.getName)
+  private[this] val logger: Logger = LoggerFactory.getLogger(getClass.getName)
 
   def suggestBy[S](query: String, sqlSuggest: String, limit: Int, newSuggest: ResultSet => Either[String, S]): Either[String, List[S]] =
     getConnection map (connection =>

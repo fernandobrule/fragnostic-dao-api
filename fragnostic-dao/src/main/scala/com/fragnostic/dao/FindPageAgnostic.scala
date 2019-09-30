@@ -19,20 +19,19 @@ trait FindPageAgnostic extends ConnectionAgnostic with PreparedStatementSupport 
     nummaxBadgets: Short,
     orderBy: String,
     rowsPerPg: Int,
-    optPrmsCount: Map[Int, (String, String)],
-    optPrmsPage: Map[Int, (String, String)],
+    prmsCount: Map[Int, (String, String)],
+    prmsPage: Map[Int, (String, String)],
     sqlCountTotalRows: String,
     sqlFindPage: String,
     newRow: ResultSet => Either[String, P]): Either[String, (Long, String, Long, Long, List[Int], Long, Long, Long, List[P], Boolean)] =
-    // numPage: Long, orderBy: String, query: String, linksLimitLeft: Long, linksLimitRight: Long, linksAsList: List[Int], rowsPerPage: Long, numRows: Long, numPages: Long, rows: List[T], isEmpty: Boolean
     findPageCountTotalRows(
       connection,
       numPage,
       nummaxBadgets,
       orderBy,
       rowsPerPg,
-      optPrmsCount,
-      optPrmsPage,
+      prmsCount,
+      prmsPage,
       sqlCountTotalRows,
       sqlFindPage,
       newRow)
@@ -71,14 +70,14 @@ trait FindPageAgnostic extends ConnectionAgnostic with PreparedStatementSupport 
     nummaxBadgets: Short,
     orderBy: String,
     rowsPerPg: Int,
-    optPrmsCount: Map[Int, (String, String)],
-    optPrmsPage: Map[Int, (String, String)],
+    prmsCount: Map[Int, (String, String)],
+    prmsPage: Map[Int, (String, String)],
     sqlCountTotalRows: String,
     sqlFindPage: String,
     newRow: ResultSet => Either[String, P]): Either[String, (Long, String, Long, Long, List[Int], Long, Long, Long, List[P], Boolean)] = {
 
     val prepStat = connection.prepareStatement(sqlCountTotalRows)
-    setParams(optPrmsCount, prepStat) fold (
+    setParams(prmsCount, prepStat) fold (
       errors => Left(errors.mkString(",")),
       col => {
         if (logger.isInfoEnabled) logger.info(
@@ -87,7 +86,7 @@ trait FindPageAgnostic extends ConnectionAgnostic with PreparedStatementSupport 
           error => {
             close(prepStat)
             logger.error(
-              s"findPageCountTotalRows | query executed with error: $error \n\tquery: $sqlCountTotalRows \n\t$optPrmsCount")
+              s"findPageCountTotalRows | query executed with error: $error \n\tquery: $sqlCountTotalRows \n\t$prmsCount")
             Left(error)
           },
           resultSet => {
@@ -103,8 +102,8 @@ trait FindPageAgnostic extends ConnectionAgnostic with PreparedStatementSupport 
                 nummaxBadgets,
                 orderBy,
                 rowsPerPg,
-                optPrmsCount,
-                optPrmsPage,
+                //optPrmsCount,
+                prmsPage,
                 sqlFindPage,
                 newRow,
                 totalRows)
@@ -152,7 +151,7 @@ trait FindPageAgnostic extends ConnectionAgnostic with PreparedStatementSupport 
     nummaxBadgets: Short,
     orderBy: String,
     rowsPerPg: Int,
-    optPrmsCount: Map[Int, (String, String)],
+    //optPrmsCount: Map[Int, (String, String)],
     optPrmsPage: Map[Int, (String, String)],
     sqlFindPage: String,
     newRow: ResultSet => Either[String, P],

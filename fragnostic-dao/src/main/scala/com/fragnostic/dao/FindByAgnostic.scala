@@ -3,7 +3,7 @@ package com.fragnostic.dao
 import java.sql.{ Connection, PreparedStatement, ResultSet }
 
 import com.fragnostic.dao.support.{ CloseResourceAgnostic, ConnectionAgnostic, PreparedStatementSupport }
-import org.slf4j.LoggerFactory
+import org.slf4j.{ Logger, LoggerFactory }
 
 /**
  * Created by Fernando Brule on 30-06-2015 22:23:00.
@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory
  */
 trait FindByAgnostic extends ConnectionAgnostic with CloseResourceAgnostic with PreparedStatementSupport {
 
-  private def logger = LoggerFactory.getLogger(getClass.getName)
+  private[this] val logger: Logger = LoggerFactory.getLogger(getClass.getName)
 
   //
   // Find By
