@@ -10,52 +10,64 @@ import scala.util.Try
  */
 trait ResultSetGetAgnostic {
 
-  def resultSetGetString: ResultSet => String =
-    (resultSet: ResultSet) => resultSet.getString(1)
+  def resultSetGetString: ResultSet => Either[String, String] = (resultSet: ResultSet) =>
+    try {
+      Right(resultSet.getString(1))
+    } catch {
+      case e: Exception => Left(e.getMessage)
+    }
 
-  def resultSetGetShort: ResultSet => Short =
-    (resultSet: ResultSet) => resultSet.getShort(1)
+  def resultSetGetShort: ResultSet => Either[String, Short] = (resultSet: ResultSet) =>
+    try {
+      Right(resultSet.getShort(1))
+    } catch {
+      case e: Exception => Left(e.getMessage)
+    }
 
-  def resultSetGetInt: ResultSet => Int =
-    (resultSet: ResultSet) => resultSet.getInt(1)
+  def resultSetGetInt: ResultSet => Either[String, Int] = (resultSet: ResultSet) =>
+    try {
+      Right(resultSet.getInt(1))
+    } catch {
+      case e: Exception => Left(e.getMessage)
+    }
 
-  def resultSetGetLong: ResultSet => Long =
-    (resultSet: ResultSet) => resultSet.getLong(1)
+  def resultSetGetLong: ResultSet => Either[String, Long] = (resultSet: ResultSet) =>
+    try {
+      Right(resultSet.getLong(1))
+    } catch {
+      case e: Exception => Left(e.getMessage)
+    }
 
-  def resultSetGetDouble: ResultSet => Double =
-    (resultSet: ResultSet) => resultSet.getDouble(1)
+  def resultSetGetDouble: ResultSet => Either[String, Double] = (resultSet: ResultSet) =>
+    try {
+      Right(resultSet.getDouble(1))
+    } catch {
+      case e: Exception => Left(e.getMessage)
+    }
 
-  def resultSetGetBigDecimal: ResultSet => BigDecimal =
-    (resultSet: ResultSet) => resultSet.getBigDecimal(1)
+  def resultSetGetBigDecimal: ResultSet => Either[String, BigDecimal] = (resultSet: ResultSet) =>
+    try {
+      Right(resultSet.getBigDecimal(1))
+    } catch {
+      case e: Exception => Left(e.getMessage)
+    }
 
-  def resultSetMaybeGetString(
-    resultSet: ResultSet,
-    fieldName: String): Option[String] =
+  def resultSetMaybeGetString(resultSet: ResultSet, fieldName: String): Option[String] =
     Option(resultSet.getString(fieldName))
 
-  def resultSetMaybeGetInt(
-    resultSet: ResultSet,
-    fieldName: String): Option[Int] =
+  def resultSetMaybeGetInt(resultSet: ResultSet, fieldName: String): Option[Int] =
     Option(resultSet.getInt(fieldName))
 
-  def resultSetMaybeGetShort(
-    resultSet: ResultSet,
-    fieldName: String): Option[Short] =
+  def resultSetMaybeGetShort(resultSet: ResultSet, fieldName: String): Option[Short] =
     Option(resultSet.getShort(fieldName))
 
-  def resultSetMaybeGetLong(
-    resultSet: ResultSet,
-    fieldName: String): Option[Long] =
+  def resultSetMaybeGetLong(resultSet: ResultSet, fieldName: String): Option[Long] =
     Option(resultSet.getLong(fieldName))
 
-  def resultSetMaybeGetDouble(
-    resultSet: ResultSet,
-    fieldName: String): Option[Double] =
+  def resultSetMaybeGetDouble(resultSet: ResultSet, fieldName: String): Option[Double] =
     Option(resultSet.getDouble(fieldName))
 
-  def resultSetMaybeGetBigDecimal(
-    resultSet: ResultSet,
-    fieldName: String): Try[BigDecimal] =
+  def resultSetMaybeGetBigDecimal(resultSet: ResultSet, fieldName: String): Try[BigDecimal] =
     Try(resultSet.getBigDecimal(fieldName))
 
   def resultSetToShort(resultSet: ResultSet, fieldName: String) =

@@ -2,14 +2,14 @@ package com.fragnostic.dao.support
 
 import java.sql.{ Connection, PreparedStatement, ResultSet, SQLException }
 
-import org.slf4j.LoggerFactory
+import org.slf4j.{ Logger, LoggerFactory }
 
 /**
  * Created by fernandobrule on 7/21/16.
  */
 trait PreparedStatementSupport extends PreparedStatementParamsSupport with CloseResourceAgnostic {
 
-  private def logger = LoggerFactory.getLogger(getClass.getName)
+  private[this] val logger: Logger = LoggerFactory.getLogger(getClass.getName)
 
   def prepareStatement(
     connection: Connection,

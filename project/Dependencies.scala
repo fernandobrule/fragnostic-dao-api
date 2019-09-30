@@ -11,6 +11,6 @@ object Dependencies {
 
   //
   lazy val fragnosticConf = "com.fragnostic" % "fragnostic-conf_2.13" % "0.1.9.1-BETA"
-  lazy val fragnosticSupport = "com.fragnostic" % "fragnostic-support_2.13" % "0.1.10.1-BETA"
+  lazy val fragnosticSupport = "com.fragnostic" % "fragnostic-support_2.13" % "0.1.10.1-SNAPSHOT"
 
 }

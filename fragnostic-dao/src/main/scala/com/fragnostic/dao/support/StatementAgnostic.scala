@@ -2,7 +2,7 @@ package com.fragnostic.dao.support
 
 import java.sql.{ SQLException, Statement }
 
-import org.slf4j.LoggerFactory
+import org.slf4j.{ Logger, LoggerFactory }
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -12,7 +12,7 @@ import scala.collection.mutable.ArrayBuffer
  */
 trait StatementAgnostic extends CloseResourceAgnostic {
 
-  private def logger = LoggerFactory.getLogger(getClass.getName)
+  private[this] val logger: Logger = LoggerFactory.getLogger(getClass.getName)
 
   def executeBatch(statement: Statement): Either[String, Array[Long]] =
     try {

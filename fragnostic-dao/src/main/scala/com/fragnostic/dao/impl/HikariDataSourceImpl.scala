@@ -15,7 +15,7 @@ trait HikariDataSourceImpl extends DataSourceApi {
 
   class DefaultDataSource extends DataSourceApi with FilesSupport {
 
-    private def logger: Logger = LoggerFactory.getLogger(getClass.getName)
+    private[this] val logger: Logger = LoggerFactory.getLogger(getClass.getName)
 
     private val HIKARI_DATASOURCE_PROPERTY_FILE_NAME = "HIKARI_DATASOURCE_PROPERTY_FILE_NAME"
     private val REGEX_ENVAR = """\{\{(\w+)\}\}""".r

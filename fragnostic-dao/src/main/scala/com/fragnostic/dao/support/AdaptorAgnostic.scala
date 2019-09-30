@@ -10,17 +10,17 @@ import java.util.{ Date => JUtilDate }
  */
 trait AdaptorAgnostic {
 
-  def stringDateToSqlDate(stDate: String, pattern: String): JSqlDate = {
+  def __deletemeplz__stringDateToSqlDate(stDate: String, pattern: String): JSqlDate = {
     val dateFormat = new SimpleDateFormat(pattern)
     new JSqlDate(dateFormat.parse(stDate).getTime)
   }
 
-  def stringDateToSqlTimestamp(stDate: String, pattern: String): Timestamp = {
+  def __deletemeplz__stringDateToSqlTimestamp(stDate: String, pattern: String): Timestamp = {
     val dateFormat = new SimpleDateFormat(pattern)
     new Timestamp(dateFormat.parse(stDate).getTime)
   }
 
-  def sqlDateToString(date: JSqlDate, pattern: String): String = {
+  def __deletemeplz__sqlDateToString(date: JSqlDate, pattern: String): String = {
     if (date != null) {
       val dateFormat = new SimpleDateFormat(pattern)
       dateFormat.format(new JUtilDate(date.getTime))
@@ -29,7 +29,7 @@ trait AdaptorAgnostic {
     }
   }
 
-  def sqlTimestampToString(timestamp: Timestamp, pattern: String): String = {
+  def __deletemeplz__sqlTimestampToString(timestamp: Timestamp, pattern: String): String = {
     if (timestamp != null) {
       val dateFormat = new SimpleDateFormat(pattern)
       dateFormat.format(new JUtilDate(timestamp.getTime))

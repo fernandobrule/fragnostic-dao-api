@@ -3,7 +3,7 @@ package com.fragnostic.dao
 import java.sql.{ Connection, PreparedStatement }
 
 import com.fragnostic.dao.support.{ ConnectionAgnostic, PreparedStatementSupport }
-import org.slf4j.LoggerFactory
+import org.slf4j.{ Logger, LoggerFactory }
 
 import scala.util.Try
 
@@ -13,7 +13,7 @@ import scala.util.Try
  */
 trait DeleteByIdAgnostic extends ConnectionAgnostic with PreparedStatementSupport {
 
-  private def logger = LoggerFactory.getLogger(getClass.getName)
+  private[this] val logger: Logger = LoggerFactory.getLogger(getClass.getName)
 
   //
   // Delete by Id
