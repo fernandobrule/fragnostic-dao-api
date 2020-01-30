@@ -4,9 +4,9 @@ import java.sql.Connection
 
 import org.scalatest.{ FunSpec, Matchers }
 
-class MySql8DatasourceTest extends FunSpec with Matchers {
+class MySql8DataSourceTest extends FunSpec with Matchers {
 
-  describe("MySql8 Datasource Test") {
+  describe("MySql8 DataSource Test") {
 
     it("Can Get MySql8 DataSource") {
       // https://mariadb.com/kb/en/library/about-mariadb-connector-j/
