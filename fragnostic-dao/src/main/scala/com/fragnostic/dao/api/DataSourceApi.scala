@@ -1,6 +1,6 @@
 package com.fragnostic.dao.api
 
-import com.zaxxer.hikari.HikariDataSource
+import javax.sql.DataSource
 
 trait DataSourceApi {
 
@@ -8,7 +8,7 @@ trait DataSourceApi {
 
   trait DataSourceApi {
 
-    def getDataSource(): Either[String, HikariDataSource]
+    def getDataSource: Either[String, DataSource]
 
   }
 

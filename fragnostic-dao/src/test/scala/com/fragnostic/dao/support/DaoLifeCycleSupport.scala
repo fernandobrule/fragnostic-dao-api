@@ -7,9 +7,9 @@ import org.slf4j.{ Logger, LoggerFactory }
 
 trait DaoLifeCycleSupport extends FunSpec with Matchers with BeforeAndAfterAll {
 
-  private def logger: Logger = LoggerFactory.getLogger(getClass)
+  private[this] val logger: Logger = LoggerFactory.getLogger(getClass.getName)
 
-  val dataSource: HikariDataSource = CakeDao.hikariDataSource.getDataSource() fold (
+  val dataSource: HikariDataSource = CakeDao.hikariDataSource.getDataSource fold (
     error => throw new IllegalStateException(error),
     dataSource => dataSource)
 

@@ -23,7 +23,8 @@ trait FindPageAgnostic extends ConnectionAgnostic with PreparedStatementSupport 
     prmsPage: Map[Int, (String, String)],
     sqlCountTotalRows: String,
     sqlFindPage: String,
-    newRow: ResultSet => Either[String, P]): Either[String, (Long, String, Long, Long, List[Int], Long, Long, Long, List[P], Boolean)] =
+    newRow: (ResultSet, Seq[String]) => Either[String, P],
+    args: Seq[String]): Either[String, (Long, String, Long, Long, List[Int], Long, Long, Long, List[P], Boolean)] =
     findPageCountTotalRows(
       connection,
       numPage,
@@ -34,7 +35,8 @@ trait FindPageAgnostic extends ConnectionAgnostic with PreparedStatementSupport 
       prmsPage,
       sqlCountTotalRows,
       sqlFindPage,
-      newRow)
+      newRow,
+      args)
 
   def findPage[P](
     numPage: Int,
@@ -45,7 +47,8 @@ trait FindPageAgnostic extends ConnectionAgnostic with PreparedStatementSupport 
     optPrmsPage: Map[Int, (String, String)],
     sqlCountTotalRows: String,
     sqlFindPage: String,
-    newRow: ResultSet => Either[String, P]): Either[String, (Long, String, Long, Long, List[Int], Long, Long, Long, List[P], Boolean)] =
+    newRow: (ResultSet, Seq[String]) => Either[String, P],
+    args: Seq[String] = Nil): Either[String, (Long, String, Long, Long, List[Int], Long, Long, Long, List[P], Boolean)] =
     getConnection map (
       connection => {
         if (logger.isInfoEnabled) logger.info(s"findPage enter")
@@ -59,7 +62,8 @@ trait FindPageAgnostic extends ConnectionAgnostic with PreparedStatementSupport 
           optPrmsPage,
           sqlCountTotalRows,
           sqlFindPage,
-          newRow)
+          newRow,
+          args)
         closeWithoutCommit(connection)
         eith
       }) getOrElse Left("agnostic.dao.find.page.error.db.nc")
@@ -74,7 +78,8 @@ trait FindPageAgnostic extends ConnectionAgnostic with PreparedStatementSupport 
     prmsPage: Map[Int, (String, String)],
     sqlCountTotalRows: String,
     sqlFindPage: String,
-    newRow: ResultSet => Either[String, P]): Either[String, (Long, String, Long, Long, List[Int], Long, Long, Long, List[P], Boolean)] = {
+    newRow: (ResultSet, Seq[String]) => Either[String, P],
+    args: Seq[String]): Either[String, (Long, String, Long, Long, List[Int], Long, Long, Long, List[P], Boolean)] = {
 
     val prepStat = connection.prepareStatement(sqlCountTotalRows)
     setParams(prmsCount, prepStat) fold (
@@ -102,11 +107,11 @@ trait FindPageAgnostic extends ConnectionAgnostic with PreparedStatementSupport 
                 nummaxBadgets,
                 orderBy,
                 rowsPerPg,
-                //optPrmsCount,
                 prmsPage,
                 sqlFindPage,
+                totalRows,
                 newRow,
-                totalRows)
+                args)
             } else {
               if (logger.isInfoEnabled) logger.info(
                 s"findPageCountTotalRows | totalRows: 0, empty set...")
@@ -117,21 +122,28 @@ trait FindPageAgnostic extends ConnectionAgnostic with PreparedStatementSupport 
       })
   }
 
-  private def addRow[P](resultSet: ResultSet, newRow: ResultSet => Either[String, P]): List[P] =
+  private def addRow[P](
+    resultSet: ResultSet,
+    newRow: (ResultSet, Seq[String]) => Either[String, P],
+    args: Seq[String]): List[P] =
     if (resultSet.next())
-      newRow(resultSet) fold (
+      newRow(resultSet, args) fold (
         error => {
           logger.error(s"addRow() - $error")
-          addRow(resultSet, newRow)
+          addRow(resultSet, newRow, args)
         },
-        row => row :: addRow(resultSet, newRow))
+        row => row :: addRow(resultSet, newRow, args))
     else {
       Nil
     }
 
-  private def getRows[P](prepStat: PreparedStatement, resultSet: ResultSet, newRow: ResultSet => Either[String, P]) =
+  private def getRows[P](
+    prepStat: PreparedStatement,
+    resultSet: ResultSet,
+    newRow: (ResultSet, Seq[String]) => Either[String, P],
+    args: Seq[String]) =
     try {
-      val rows = addRow(resultSet, newRow)
+      val rows = addRow(resultSet, newRow, args)
       close(resultSet, prepStat)
       Right(rows)
     } catch {
@@ -154,8 +166,9 @@ trait FindPageAgnostic extends ConnectionAgnostic with PreparedStatementSupport 
     //optPrmsCount: Map[Int, (String, String)],
     optPrmsPage: Map[Int, (String, String)],
     sqlFindPage: String,
-    newRow: ResultSet => Either[String, P],
-    numRows: Int): Either[String, (Long, String, Long, Long, List[Int], Long, Long, Long, List[P], Boolean)] = {
+    numRows: Int,
+    newRow: (ResultSet, Seq[String]) => Either[String, P],
+    args: Seq[String]): Either[String, (Long, String, Long, Long, List[Int], Long, Long, Long, List[P], Boolean)] = {
 
     val numPages: Int = getNumPages(numRows, rowsPerPg)
     val numPage = getNumPage(numPageAparente, numPages)
@@ -183,7 +196,7 @@ trait FindPageAgnostic extends ConnectionAgnostic with PreparedStatementSupport 
 
             if (logger.isInfoEnabled) logger.info(s"findPage | query executed 2")
 
-            getRows(prepStat, resultSet, newRow) fold (
+            getRows(prepStat, resultSet, newRow, args) fold (
               error => Left(error),
               list =>
                 if (list.nonEmpty) {

@@ -21,11 +21,19 @@ trait SuggestAgnostic extends ConnectionAgnostic with CloseResourceAgnostic with
         prepStat.setString(1, s"$query")
         prepStat.setInt(2, limit)
         val resultSet = prepStat.executeQuery()
-        val list = newList(resultSet, newSuggest)
-        close(resultSet)
-        close(prepStat)
-        closeWithoutCommit(connection)
-        Right(list)
+        newList(resultSet, newSuggest) fold (
+          error => {
+            logger.error(s"suggestBy() - $error")
+            close(resultSet)
+            close(prepStat)
+            Left(error)
+          },
+          list => {
+            close(resultSet)
+            close(prepStat)
+            closeWithoutCommit(connection)
+            Right(list)
+          })
       } catch {
         case e: SQLException =>
           closeWithoutCommit(connection)

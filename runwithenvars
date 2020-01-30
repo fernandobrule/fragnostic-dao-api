@@ -12,6 +12,7 @@ echo ""
 echo "IP_DB : $IP_DB"
 echo ""
 
-export HIKARI_DATASOURCE_PROPERTY_FILE_NAME=fragnostic-dao/src/test/resources/fragnostic-dao-test.properties
+export HIKARI_DATASOURCE_PROPERTY_FILE_NAME=fragnostic-dao/src/test/resources/fragnostic-dao-hikari-datasource-test.properties
+export MYSQL8_DATASOURCE_PROPERTY_FILE_NAME=fragnostic-dao/src/test/resources/fragnostic-dao-mysql8-datasource-test.properties
 
 ./sbt -v -213
