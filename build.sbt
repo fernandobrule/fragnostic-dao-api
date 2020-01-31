@@ -81,6 +81,7 @@ lazy val fragnosticDao = Project(
       scalatest,
       hikariCP,
       mariadbJavaClient,
+      mysql8JavaClient,
       fragnosticConf,
       fragnosticSupport
     ),

@@ -38,6 +38,13 @@ trait ResultSetGetAgnostic {
       case e: Exception => Left(e.getMessage)
     }
 
+  def resultSetGetLongLong: ResultSet => Either[String, (Long, Long)] = (resultSet: ResultSet) =>
+    try {
+      Right((resultSet.getLong(1), resultSet.getLong(2)))
+    } catch {
+      case e: Exception => Left(e.getMessage)
+    }
+
   def resultSetGetDouble: ResultSet => Either[String, Double] = (resultSet: ResultSet) =>
     try {
       Right(resultSet.getDouble(1))
@@ -70,19 +77,19 @@ trait ResultSetGetAgnostic {
   def resultSetMaybeGetBigDecimal(resultSet: ResultSet, fieldName: String): Try[BigDecimal] =
     Try(resultSet.getBigDecimal(fieldName))
 
-  def resultSetToShort(resultSet: ResultSet, fieldName: String) =
+  def resultSetToShort(resultSet: ResultSet, fieldName: String): Short =
     resultSet.getString(fieldName).toShort
 
-  def resultSetToInt(resultSet: ResultSet, fieldName: String) =
+  def resultSetToInt(resultSet: ResultSet, fieldName: String): Int =
     resultSet.getString(fieldName).toInt
 
-  def resultSetToLong(resultSet: ResultSet, fieldName: String) =
+  def resultSetToLong(resultSet: ResultSet, fieldName: String): Long =
     resultSet.getString(fieldName).toLong
 
-  def resultSetToDouble(resultSet: ResultSet, fieldName: String) =
+  def resultSetToDouble(resultSet: ResultSet, fieldName: String): Double =
     resultSet.getString(fieldName).toDouble
 
-  def resultSetToBigDecimal(resultSet: ResultSet, fieldName: String) =
+  def resultSetToBigDecimal(resultSet: ResultSet, fieldName: String): BigDecimal =
     BigDecimal(resultSet.getString(fieldName))
 
 }

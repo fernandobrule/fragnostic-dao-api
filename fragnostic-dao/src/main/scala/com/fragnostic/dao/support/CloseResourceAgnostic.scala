@@ -12,7 +12,7 @@ trait CloseResourceAgnostic {
 
   private[this] val logger: Logger = LoggerFactory.getLogger(getClass.getName)
 
-  def closeWithoutCommit(connection: Connection) =
+  def closeWithoutCommit(connection: Connection): Unit =
     try {
       connection.close()
       if (logger.isInfoEnabled) logger.info("closeWithoutCommit | Connection closed")
@@ -28,7 +28,19 @@ trait CloseResourceAgnostic {
           s"close.resource.agnostic.error.close.without.commit (${e.getMessage})")
     }
 
-  def closeWithCommit(connection: Connection) =
+  def closeWithoutCommitAndReturnNone(connection: Connection): Option[Nothing] = {
+    closeWithoutCommit(connection)
+    logger.error(s"closeAndReturnNone() - None")
+    None
+  }
+
+  def closeWithoutCommitAndReturnError(connection: Connection, error: String): String = {
+    closeWithoutCommit(connection)
+    logger.error(s"closeAndReturnError() - $error")
+    error
+  }
+
+  def closeWithCommit(connection: Connection): Unit =
     try {
       connection.commit()
       connection.close()
@@ -45,7 +57,7 @@ trait CloseResourceAgnostic {
           s"close.resource.agnostic.error.close.with.commit (${e.getMessage})")
     }
 
-  def closeWithRollBack(connection: Connection) =
+  def closeWithRollBack(connection: Connection): Unit =
     try {
       connection.rollback()
       connection.close()
@@ -62,7 +74,7 @@ trait CloseResourceAgnostic {
           s"close.resource.agnostic.error.close.with.roollback (${e.getMessage})")
     }
 
-  def close(statement: Statement) =
+  def close(statement: Statement): Unit =
     try {
       statement.close()
       if (logger.isInfoEnabled) logger.info("close | Statement closed")
@@ -83,7 +95,7 @@ trait CloseResourceAgnostic {
     close(prepStat)
   }
 
-  def close(prepStat: PreparedStatement) =
+  def close(prepStat: PreparedStatement): Unit =
     try {
       prepStat.close()
       if (logger.isInfoEnabled) logger.info("close | PreparedStatement closed")
@@ -99,7 +111,7 @@ trait CloseResourceAgnostic {
           s"close.resource.agnostic.error.close.prepared.statement (${e.getMessage})")
     }
 
-  def close(resultSet: ResultSet) =
+  def close(resultSet: ResultSet): Unit =
     try {
       resultSet.close()
       if (logger.isInfoEnabled) logger.info("close | ResultSet closed")

@@ -48,7 +48,7 @@ class FindPageAgnosticTest extends DaoLifeCycleSupport with FindPageAgnostic wit
       val orderDesc = false
       val sqlFindPage: String = applyOrderBy(orderByMap, sqlFindPageStage, orderBy, orderDesc)
 
-      def newCodeName = (rs: ResultSet) => try {
+      def newCodeName = (rs: ResultSet, args: Seq[String]) => try {
         Right(CodeName(
           rs.getString("test_code"),
           rs.getString("test_name")))

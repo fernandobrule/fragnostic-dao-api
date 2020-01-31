@@ -51,9 +51,16 @@ trait FindListAgnostic extends ConnectionAgnostic with PreparedStatementSupport 
             Left(s"find.list.by.agnostic.error.on.exec.query")
           },
           resultSet => {
-            val list = newList(resultSet, newEntity)
-            close(resultSet, prepStat)
-            Right(list)
+            newList(resultSet, newEntity) fold (
+              error => {
+                logger.error(s"findList() - $error")
+                close(resultSet, prepStat)
+                Left(error)
+              },
+              list => {
+                close(resultSet, prepStat)
+                Right(list)
+              })
           }))
 
 }

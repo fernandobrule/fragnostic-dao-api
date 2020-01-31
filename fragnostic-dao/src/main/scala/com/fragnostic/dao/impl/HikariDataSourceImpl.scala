@@ -26,7 +26,7 @@ trait HikariDataSourceImpl extends DataSourceApi {
         case _ => None
       }
 
-    override def getDataSource(): Either[String, HikariDataSource] =
+    override def getDataSource: Either[String, HikariDataSource] =
       CakeServiceConf.confService.getConf(HIKARI_DATASOURCE_PROPERTY_FILE_NAME).fold(
         error => {
           logger.error(s"getDataSource() - ERROR al cargar propertyFileName, $error")
