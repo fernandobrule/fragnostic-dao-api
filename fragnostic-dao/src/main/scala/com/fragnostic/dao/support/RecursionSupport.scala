@@ -13,16 +13,19 @@ trait RecursionSupport {
 
   def newList[T](
     resultSet: ResultSet,
-    newEntity: ResultSet => Either[String, T]): List[T] =
+    newEntity: ResultSet => Either[String, T]): Either[String, List[T]] =
     if (resultSet.next()) {
       newEntity(resultSet) fold (
         error => {
           logger.error(s"newList() - $error")
-          newList(resultSet, newEntity)
+          //newList(resultSet, newEntity)
+          Left(error)
         },
-        entity => entity :: newList(resultSet, newEntity))
+        entity => newList(resultSet, newEntity) fold (
+          error => Left(error),
+          list => Right(entity :: list)))
     } else {
-      Nil
+      Right(Nil)
     }
 
 }
