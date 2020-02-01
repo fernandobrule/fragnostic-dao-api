@@ -40,19 +40,19 @@ lazy val fragnosticSettings = Seq(
 )
 
 lazy val fragnosticProject = Project(
-  id = "fragnostic-dao-project",
+  id = "fragnostic-dao-api-project",
   base = file(".")).settings(
     fragnosticSettings ++ Seq(
-    name := "fragnostic-dao",
+    name := "fragnostic-dao-api",
     artifacts := Classpaths.artifactDefs(Seq(packageDoc in Compile, makePom in Compile)).value,
     packagedArtifacts := Classpaths.packaged(Seq(packageDoc in Compile, makePom in Compile)).value,
     updateOptions := updateOptions.value.withLatestSnapshots(false),
-    description := "fragnostic-dao",
+    description := "fragnostic-dao-api",
     shellPrompt := { state =>
       s"sbt:${Project.extract(state).currentProject.id}" + Def.withColor("> ", Option(scala.Console.CYAN))
     }
   )).aggregate(
-    fragnosticDao
+    fragnosticDaoApi
   ).enablePlugins()
  
 lazy val manifestSetting = packageOptions += {
@@ -72,20 +72,18 @@ lazy val manifestSetting = packageOptions += {
 
 lazy val doNotPublish = Seq(publish := {}, publishLocal := {}, PgpKeys.publishSigned := {}, PgpKeys.publishLocalSigned := {})
 
-lazy val fragnosticDao = Project(
-  id = "fragnostic-dao",
-  base = file("fragnostic-dao")).settings(fragnosticSettings ++ Seq(
+lazy val fragnosticDaoApi = Project(
+  id = "fragnostic-dao-api",
+  base = file("fragnostic-dao-api")).settings(fragnosticSettings ++ Seq(
     libraryDependencies ++= Seq(
       logbackClassic,
       slf4jApi,
       scalatest,
-      hikariCP,
-      mariadbJavaClient,
-      mysql8JavaClient,
-      fragnosticConf,
       fragnosticSupport
+      //fragnosticConf,
+      //fragnosticSupport
     ),
-    description := "fragnostic-dao"
+    description := "fragnostic-dao-api"
   )
 ) dependsOn(
 )

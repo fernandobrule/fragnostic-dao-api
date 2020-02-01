@@ -2,8 +2,9 @@ package com.fragnostic.dao
 
 import java.sql.ResultSet
 
+import com.fragnostic.dao.crud.FindPageAgnostic
 import com.fragnostic.dao.glue.CodeName
-import com.fragnostic.dao.support.{ DaoLifeCycleSupport, SqlOrderBySupport }
+import com.fragnostic.dao.support.{DaoLifeCycleSupport, SqlOrderBySupport}
 
 class FindPageAgnosticTest extends DaoLifeCycleSupport with FindPageAgnostic with SqlOrderBySupport {
 

@@ -1,4 +1,4 @@
-package com.fragnostic.dao
+package com.fragnostic.dao.crud
 
 import java.sql.{ ResultSet, SQLException }
 

@@ -1,8 +1,8 @@
-package com.fragnostic.dao
+package com.fragnostic.dao.crud
 
 import java.sql.{ Connection, PreparedStatement, ResultSet, Statement }
 
-import com.fragnostic.dao.support._
+import com.fragnostic.dao.support.{ ConnectionAgnostic, JdbcGeneratedKeysAgnostic, PreparedStatementSupport }
 import org.slf4j.{ Logger, LoggerFactory }
 
 /**
