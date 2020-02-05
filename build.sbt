@@ -80,8 +80,6 @@ lazy val fragnosticDaoApi = Project(
       slf4jApi,
       scalatest,
       fragnosticSupport
-      //fragnosticConf,
-      //fragnosticSupport
     ),
     description := "fragnostic-dao-api"
   )

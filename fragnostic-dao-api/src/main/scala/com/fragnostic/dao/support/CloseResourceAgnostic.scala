@@ -57,6 +57,12 @@ trait CloseResourceAgnostic {
           s"close.resource.agnostic.error.close.with.commit (${e.getMessage})")
     }
 
+  def closeWithCommitAndReturnSomething[T](connection: Connection, t: T): T = {
+    closeWithCommit(connection)
+    logger.error(s"closeWithCommitAndReturnSomething() - $t")
+    t
+  }
+
   def closeWithRollBack(connection: Connection): Unit =
     try {
       connection.rollback()

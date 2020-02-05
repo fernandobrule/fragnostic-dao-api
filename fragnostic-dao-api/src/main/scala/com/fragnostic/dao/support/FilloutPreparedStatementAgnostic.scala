@@ -366,7 +366,23 @@ trait FilloutPreparedStatementAgnostic {
         }
       }
 
-  def filloutPsWithStrShrLng =
+  def filloutPsWithBigDecLng = (prepStat: PreparedStatement, request: (BigDecimal, Long)) =>
+    try {
+      prepStat.setBigDecimal(1, request._1.bigDecimal)
+      prepStat.setLong(2, request._2)
+      Right(prepStat)
+    } catch {
+      case e: Exception => {
+        logger.error(s"filloutPsWithBigDecLng | $e")
+        Left("fillout.prepstat.agnostic.with.bigdecimal.long.error")
+      }
+      case e: Throwable => {
+        logger.error(s"filloutPsWithBigDecLng | $e")
+        Left("fillout.prepstat.agnostic.with.bigdecimal.long.error")
+      }
+    }
+
+  def filloutPsWithStrShortLng =
     (prepStat: PreparedStatement,
       request: (String, Short, Long)) =>
       try {
@@ -376,11 +392,11 @@ trait FilloutPreparedStatementAgnostic {
         Right(prepStat)
       } catch {
         case e: Exception => {
-          logger.error(s"filloutPsWithStrShrLng | $e")
+          logger.error(s"filloutPsWithStrShortLng | $e")
           Left("fillout.prepstat.agnostic.with.string.short.long")
         }
         case e: Throwable => {
-          logger.error(s"filloutPsWithStrShrLng | $e")
+          logger.error(s"filloutPsWithStrShortLng | $e")
           Left("fillout.prepstat.agnostic.with.string.short.long")
         }
       }
