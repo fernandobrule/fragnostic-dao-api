@@ -59,7 +59,7 @@ trait CloseResourceAgnostic {
 
   def closeWithCommitAndReturnSomething[T](connection: Connection, t: T): T = {
     closeWithCommit(connection)
-    logger.error(s"closeWithCommitAndReturnSomething() - $t")
+    logger.info(s"closeWithCommitAndReturnSomething() - $t")
     t
   }
 
