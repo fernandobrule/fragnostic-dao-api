@@ -12,6 +12,36 @@ trait FilloutPreparedStatementAgnostic {
 
   private[this] val logger: Logger = LoggerFactory.getLogger(getClass.getName)
 
+  def filloutPsWithStrList =
+    (prepStat: PreparedStatement,
+      req: List[String]) =>
+      try {
+        req.zipWithIndex.foreach(par => prepStat.setString(par._2 + 1, par._1))
+        Right(prepStat)
+      } catch {
+        case e: Exception =>
+          logger.error(s"filloutPsWithStrList() - $e")
+          Left("fillout.prepstat.agnostic.with.string.list.error")
+        case e: Throwable =>
+          logger.error(s"filloutPsWithStrList() - $e")
+          Left("fillout.prepstat.agnostic.with.string.list.error")
+      }
+
+  def filloutPsWithLongList =
+    (prepStat: PreparedStatement,
+      req: List[Long]) =>
+      try {
+        req.zipWithIndex.foreach(par => prepStat.setLong(par._2 + 1, par._1))
+        Right(prepStat)
+      } catch {
+        case e: Exception =>
+          logger.error(s"filloutPsWithStrList() - $e")
+          Left("fillout.prepstat.agnostic.with.long.list.error")
+        case e: Throwable =>
+          logger.error(s"filloutPsWithStrList() - $e")
+          Left("fillout.prepstat.agnostic.with.long.list.error")
+      }
+
   def filloutPsWithString =
     (prepStat: PreparedStatement, value: String) =>
       try {
