@@ -9,19 +9,19 @@ import org.slf4j.{ Logger, LoggerFactory }
  */
 trait RecursionSupport {
 
-  private def logger: Logger = LoggerFactory.getLogger(getClass.getName)
+  private[this] val logger: Logger = LoggerFactory.getLogger(getClass.getName)
 
   def newList[T](
     resultSet: ResultSet,
-    newEntity: ResultSet => Either[String, T]): Either[String, List[T]] =
+    newEntity: (ResultSet, Seq[String]) => Either[String, T],
+    args: Seq[String]): Either[String, List[T]] =
     if (resultSet.next()) {
-      newEntity(resultSet) fold (
+      newEntity(resultSet, args) fold (
         error => {
           logger.error(s"newList() - $error")
-          //newList(resultSet, newEntity)
           Left(error)
         },
-        entity => newList(resultSet, newEntity) fold (
+        entity => newList(resultSet, newEntity, args) fold (
           error => Left(error),
           list => Right(entity :: list)))
     } else {

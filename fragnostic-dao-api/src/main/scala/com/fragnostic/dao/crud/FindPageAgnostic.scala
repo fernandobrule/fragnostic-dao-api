@@ -11,7 +11,7 @@ import org.slf4j.{ Logger, LoggerFactory }
  */
 trait FindPageAgnostic extends ConnectionAgnostic with PreparedStatementSupport with PageSupport with PreparedStatementParamsSupport {
 
-  private def logger: Logger = LoggerFactory.getLogger(getClass.getName)
+  private[this] val logger: Logger = LoggerFactory.getLogger(getClass.getName)
 
   def findPage[P](
     connection: Connection,
@@ -24,7 +24,7 @@ trait FindPageAgnostic extends ConnectionAgnostic with PreparedStatementSupport 
     sqlCountTotalRows: String,
     sqlFindPage: String,
     newRow: (ResultSet, Seq[String]) => Either[String, P],
-    args: Seq[String]): Either[String, (Long, String, Long, Long, List[Int], Long, Long, Long, List[P], Boolean)] =
+    args: Seq[String] = Nil): Either[String, (Long, String, Long, Long, List[Int], Long, Long, Long, List[P], Boolean)] =
     findPageCountTotalRows(
       connection,
       numPage,
@@ -48,7 +48,7 @@ trait FindPageAgnostic extends ConnectionAgnostic with PreparedStatementSupport 
     sqlCountTotalRows: String,
     sqlFindPage: String,
     newRow: (ResultSet, Seq[String]) => Either[String, P],
-    args: Seq[String] = Nil): Either[String, (Long, String, Long, Long, List[Int], Long, Long, Long, List[P], Boolean)] =
+    args: Seq[String]): Either[String, (Long, String, Long, Long, List[Int], Long, Long, Long, List[P], Boolean)] =
     getConnection map (
       connection => {
         if (logger.isInfoEnabled) logger.info(s"findPage enter")
