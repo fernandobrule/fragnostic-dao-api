@@ -17,9 +17,10 @@ trait FindListAgnostic extends ConnectionAgnostic with PreparedStatementSupport 
   //
   def findList[T](
     sqlFindListBy: String,
-    newEntity: ResultSet => Either[String, T]): Either[String, List[T]] =
+    newEntity: (ResultSet, Seq[String]) => Either[String, T],
+    args: Seq[String] = Nil): Either[String, List[T]] =
     getConnection map (
-      connection => findList(connection, sqlFindListBy, newEntity) fold (
+      connection => findList(connection, sqlFindListBy, newEntity, args) fold (
         error => {
           closeWithoutCommit(connection)
           Left(error)
@@ -35,7 +36,8 @@ trait FindListAgnostic extends ConnectionAgnostic with PreparedStatementSupport 
   def findList[T](
     connection: Connection,
     sqlFindListBy: String,
-    newEntity: ResultSet => Either[String, T]): Either[String, List[T]] =
+    newEntity: (ResultSet, Seq[String]) => Either[String, T],
+    args: Seq[String]): Either[String, List[T]] =
     prepareStatement(connection, sqlFindListBy) fold (
       error => {
         logger.error(
@@ -51,7 +53,7 @@ trait FindListAgnostic extends ConnectionAgnostic with PreparedStatementSupport 
             Left(s"find.list.by.agnostic.error.on.exec.query")
           },
           resultSet => {
-            newList(resultSet, newEntity) fold (
+            newList(resultSet, newEntity, args) fold (
               error => {
                 logger.error(s"findList() - $error")
                 close(resultSet, prepStat)

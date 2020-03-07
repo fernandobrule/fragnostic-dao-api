@@ -20,14 +20,16 @@ trait FindByIdAgnostic extends ConnectionAgnostic with PreparedStatementSupport 
     entityId: I,
     sqlFindById: String,
     filloutPsFindById: (PreparedStatement, I) => Either[String, PreparedStatement],
-    newEntity: ResultSet => Either[String, T]): Either[String, Option[T]] =
+    newEntity: (ResultSet, Seq[String]) => Either[String, T],
+    args: Seq[String] = Nil): Either[String, Option[T]] =
     getConnection map (connection =>
       findById(
         connection,
         entityId,
         sqlFindById,
         filloutPsFindById,
-        newEntity) fold (
+        newEntity,
+        args) fold (
         error => {
           logger.error(s"findById | error: $error")
           closeWithoutCommit(connection)
@@ -45,7 +47,8 @@ trait FindByIdAgnostic extends ConnectionAgnostic with PreparedStatementSupport 
     entityId: I,
     sqlFindById: String,
     filloutPsFindById: (PreparedStatement, I) => Either[String, PreparedStatement],
-    newEntity: ResultSet => Either[String, T]): Either[String, Option[T]] = {
+    newEntity: (ResultSet, Seq[String]) => Either[String, T],
+    args: Seq[String]): Either[String, Option[T]] = {
 
     val prepStat = connection.prepareStatement(sqlFindById)
     filloutPsFindById(prepStat, entityId) fold (
@@ -61,7 +64,7 @@ trait FindByIdAgnostic extends ConnectionAgnostic with PreparedStatementSupport 
           },
           resultSet =>
             if (resultSet.next()) {
-              newEntity(resultSet) fold (
+              newEntity(resultSet, args) fold (
                 error => {
                   logger.error(s"findById() - $error")
                   Left(error)
