@@ -13,7 +13,12 @@ trait SuggestAgnostic extends ConnectionAgnostic with CloseResourceAgnostic with
 
   private[this] val logger: Logger = LoggerFactory.getLogger(getClass.getName)
 
-  def suggestBy[S](query: String, sqlSuggest: String, limit: Int, newSuggest: ResultSet => Either[String, S]): Either[String, List[S]] =
+  def suggestBy[S](
+    query: String,
+    sqlSuggest: String,
+    limit: Int,
+    newSuggest: (ResultSet, Seq[String]) => Either[String, S],
+    args: Seq[String] = Nil): Either[String, List[S]] =
     getConnection map (connection =>
       try {
         // TODO this try
@@ -21,7 +26,7 @@ trait SuggestAgnostic extends ConnectionAgnostic with CloseResourceAgnostic with
         prepStat.setString(1, s"$query")
         prepStat.setInt(2, limit)
         val resultSet = prepStat.executeQuery()
-        newList(resultSet, newSuggest) fold (
+        newList(resultSet, newSuggest, args) fold (
           error => {
             logger.error(s"suggestBy() - $error")
             close(resultSet)

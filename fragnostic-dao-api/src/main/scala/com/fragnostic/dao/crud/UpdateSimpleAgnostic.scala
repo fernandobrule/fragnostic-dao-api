@@ -17,8 +17,7 @@ trait UpdateSimpleAgnostic extends CloseResourceAgnostic with ConnectionAgnostic
     commit: Boolean): Either[String, Int] =
     getConnection map (connection =>
       update(connection, sqlUpdate) match {
-        case Success(affectedRows) => {
-
+        case Success(affectedRows) =>
           validateAffRows map (
             number =>
               if (affectedRows == number) {
@@ -31,12 +30,9 @@ trait UpdateSimpleAgnostic extends CloseResourceAgnostic with ConnectionAgnostic
               evaCommit(connection, commit)
               Right(affectedRows)
             }
-
-        }
-        case Failure(exception) => {
+        case Failure(exception) =>
           closeWithoutCommit(connection)
           Left(exception.getMessage)
-        }
       }) getOrElse Left("update.simple.agnostic.error.no.db.conn")
 
   private def update(connection: Connection, sqlUpdate: String): Try[Int] =

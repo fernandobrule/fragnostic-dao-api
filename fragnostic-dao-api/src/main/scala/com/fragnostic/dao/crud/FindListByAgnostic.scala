@@ -19,7 +19,8 @@ trait FindListByAgnostic extends ConnectionAgnostic with PreparedStatementSuppor
     parameter: P,
     sqlFindListBy: String,
     filloutPsFindListBy: (PreparedStatement, P) => Either[String, PreparedStatement],
-    newEntity: ResultSet => Either[String, T]): Either[String, List[T]] =
+    newEntity: (ResultSet, Seq[String]) => Either[String, T],
+    args: Seq[String] = Nil): Either[String, List[T]] =
     getConnection map (
       connection =>
         findListBy(
@@ -27,7 +28,8 @@ trait FindListByAgnostic extends ConnectionAgnostic with PreparedStatementSuppor
           parameter,
           sqlFindListBy,
           filloutPsFindListBy,
-          newEntity) fold (
+          newEntity,
+          args) fold (
           error => {
             closeWithoutCommit(connection)
             Left(error)
@@ -45,7 +47,8 @@ trait FindListByAgnostic extends ConnectionAgnostic with PreparedStatementSuppor
     parameter: P,
     sqlFindListBy: String,
     filloutPsFindListBy: (PreparedStatement, P) => Either[String, PreparedStatement],
-    newEntity: ResultSet => Either[String, T]): Either[String, List[T]] =
+    newEntity: (ResultSet, Seq[String]) => Either[String, T],
+    args: Seq[String]): Either[String, List[T]] =
     prepareStatement(connection, sqlFindListBy) fold (
       error => {
         logger.error(
@@ -69,7 +72,7 @@ trait FindListByAgnostic extends ConnectionAgnostic with PreparedStatementSuppor
                 Left(s"find.list.by.agnostic.error.on.exec.query")
               },
               resultSet => {
-                newList(resultSet, newEntity) fold (
+                newList(resultSet, newEntity, args) fold (
                   error => {
                     logger.error(s"findListBy() - $error")
                     close(resultSet, prepStat)
