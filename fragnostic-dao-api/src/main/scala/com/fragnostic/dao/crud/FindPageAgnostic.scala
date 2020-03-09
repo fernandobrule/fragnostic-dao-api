@@ -14,31 +14,6 @@ trait FindPageAgnostic extends ConnectionAgnostic with PreparedStatementSupport 
   private[this] val logger: Logger = LoggerFactory.getLogger(getClass.getName)
 
   def findPage[P](
-    connection: Connection,
-    numPage: Int,
-    nummaxBadgets: Short,
-    orderBy: String,
-    rowsPerPg: Int,
-    prmsCount: Map[Int, (String, String)],
-    prmsPage: Map[Int, (String, String)],
-    sqlCountTotalRows: String,
-    sqlFindPage: String,
-    newRow: (ResultSet, Seq[String]) => Either[String, P],
-    args: Seq[String] = Nil): Either[String, (Long, String, Long, Long, List[Int], Long, Long, Long, List[P], Boolean)] =
-    findPageCountTotalRows(
-      connection,
-      numPage,
-      nummaxBadgets,
-      orderBy,
-      rowsPerPg,
-      prmsCount,
-      prmsPage,
-      sqlCountTotalRows,
-      sqlFindPage,
-      newRow,
-      args)
-
-  def findPage[P](
     numPage: Int,
     nummaxBadgets: Short,
     orderBy: String,
@@ -48,7 +23,7 @@ trait FindPageAgnostic extends ConnectionAgnostic with PreparedStatementSupport 
     sqlCountTotalRows: String,
     sqlFindPage: String,
     newRow: (ResultSet, Seq[String]) => Either[String, P],
-    args: Seq[String]): Either[String, (Long, String, Long, Long, List[Int], Long, Long, Long, List[P], Boolean)] =
+    args: Seq[String] = Nil): Either[String, (Long, String, Long, Long, List[Int], Long, Long, Long, List[P], Boolean)] =
     getConnection map (
       connection => {
         if (logger.isInfoEnabled) logger.info(s"findPage enter")
@@ -67,6 +42,31 @@ trait FindPageAgnostic extends ConnectionAgnostic with PreparedStatementSupport 
         closeWithoutCommit(connection)
         eith
       }) getOrElse Left("agnostic.dao.find.page.error.db.nc")
+
+  def findPage[P](
+    connection: Connection,
+    numPage: Int,
+    nummaxBadgets: Short,
+    orderBy: String,
+    rowsPerPg: Int,
+    prmsCount: Map[Int, (String, String)],
+    prmsPage: Map[Int, (String, String)],
+    sqlCountTotalRows: String,
+    sqlFindPage: String,
+    newRow: (ResultSet, Seq[String]) => Either[String, P],
+    args: Seq[String]): Either[String, (Long, String, Long, Long, List[Int], Long, Long, Long, List[P], Boolean)] =
+    findPageCountTotalRows(
+      connection,
+      numPage,
+      nummaxBadgets,
+      orderBy,
+      rowsPerPg,
+      prmsCount,
+      prmsPage,
+      sqlCountTotalRows,
+      sqlFindPage,
+      newRow,
+      args)
 
   private def findPageCountTotalRows[P](
     connection: Connection,
