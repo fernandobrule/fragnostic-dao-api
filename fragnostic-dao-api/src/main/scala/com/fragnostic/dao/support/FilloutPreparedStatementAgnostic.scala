@@ -482,7 +482,36 @@ trait FilloutPreparedStatementAgnostic extends DbTypesSupport {
     }
   }
 
-  def filloutPsWithArgs[T, U, V]: (PreparedStatement, (T, U, V)) => Either[String, PreparedStatement] =
+  def filloutPsWith1Args[T]: (PreparedStatement, (T)) => Either[String, PreparedStatement] =
+    (prepStat: PreparedStatement, request: (T)) =>
+      try {
+        handle(prepStat, 1, request)
+        Right(prepStat)
+      } catch {
+        case e: Exception =>
+          logger.error(s"$e")
+          Left("fillout.ps.with.1.args.error")
+        case e: Throwable =>
+          logger.error(s"$e")
+          Left("fillout.ps.with.1.args.error")
+      }
+
+  def filloutPsWith2Args[T, U]: (PreparedStatement, (T, U)) => Either[String, PreparedStatement] =
+    (prepStat: PreparedStatement, request: (T, U)) =>
+      try {
+        handle(prepStat, 1, request._1)
+        handle(prepStat, 2, request._2)
+        Right(prepStat)
+      } catch {
+        case e: Exception =>
+          logger.error(s"$e")
+          Left("fillout.ps.with.2.args.error")
+        case e: Throwable =>
+          logger.error(s"$e")
+          Left("fillout.ps.with.2.args.error")
+      }
+
+  def filloutPsWith3Args[T, U, V]: (PreparedStatement, (T, U, V)) => Either[String, PreparedStatement] =
     (prepStat: PreparedStatement, request: (T, U, V)) =>
       try {
         handle(prepStat, 1, request._1)
@@ -492,10 +521,27 @@ trait FilloutPreparedStatementAgnostic extends DbTypesSupport {
       } catch {
         case e: Exception =>
           logger.error(s"$e")
-          Left("fillout.ps.with.long.long.string.error")
+          Left("fillout.ps.with.3.args.error")
         case e: Throwable =>
           logger.error(s"$e")
-          Left("fillout.ps.with.long.long.string,error")
+          Left("fillout.ps.with.3.args.error")
+      }
+
+  def filloutPsWith4Args[T, U, V, W]: (PreparedStatement, (T, U, V, W)) => Either[String, PreparedStatement] =
+    (prepStat: PreparedStatement, request: (T, U, V, W)) =>
+      try {
+        handle(prepStat, 1, request._1)
+        handle(prepStat, 2, request._2)
+        handle(prepStat, 3, request._3)
+        handle(prepStat, 4, request._4)
+        Right(prepStat)
+      } catch {
+        case e: Exception =>
+          logger.error(s"$e")
+          Left("fillout.ps.with.4.args.error")
+        case e: Throwable =>
+          logger.error(s"$e")
+          Left("fillout.ps.with.4.args.error")
       }
 
 }
