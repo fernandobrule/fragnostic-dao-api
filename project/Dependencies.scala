@@ -9,7 +9,7 @@ object Dependencies {
   lazy val mysql8JavaClient = "mysql" % "mysql-connector-java" % "8.0.18" % "test"
 
 
-  lazy val fragnosticSupport = "com.fragnostic" % "fragnostic-support_2.13" % "0.1.14-SNAPSHOT"
-  lazy val fragnosticConf = "com.fragnostic" % "fragnostic-conf_2.13" % "0.1.11" % "test"
+  lazy val fragnosticSupport = "com.fragnostic" % "fragnostic-support_2.13" % "0.1.14-SNAPSHOT" % "test"
+  lazy val fragnosticConfEnv = "com.fragnostic" % "fragnostic-conf-env_2.13" % "0.1.0-SNAPSHOT" % "test"
 
 }
