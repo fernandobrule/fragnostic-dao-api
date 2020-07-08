@@ -2,7 +2,6 @@ package com.fragnostic.dao.support
 
 import java.sql.PreparedStatement
 
-import com.fragnostic.support.DbTypesSupport
 import org.slf4j.{ Logger, LoggerFactory }
 
 /**

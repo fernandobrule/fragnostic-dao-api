@@ -5,4 +5,3 @@
 -XX:ReservedCodeCacheSize=128m
 -Djava.awt.headless=true
 -XX:+CMSClassUnloadingEnabled
--XX:+UseConcMarkSweepGC

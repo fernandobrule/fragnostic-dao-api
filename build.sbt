@@ -79,6 +79,8 @@ lazy val fragnosticDaoApi = Project(
       logbackClassic,
       slf4jApi,
       scalatest,
+      mysql8JavaClient,
+      fragnosticConfEnv,
       fragnosticSupport
     ),
     description := "fragnostic-dao-api"

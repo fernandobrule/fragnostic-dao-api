@@ -20,7 +20,8 @@ trait CreateAgnostic extends ConnectionAgnostic with PreparedStatementSupport wi
     createRequest: R,
     sqlCreate: String,
     filloutPsCreate: (PreparedStatement, R) => Either[String, PreparedStatement],
-    resultSetExtractId: ResultSet => Either[String, I]): Either[String, I] =
+    resultSetExtractId: (ResultSet, Seq[String]) => Either[String, I],
+    args: Seq[String] = Nil): Either[String, I] =
     getConnection map (
       connection =>
         create(
@@ -28,7 +29,8 @@ trait CreateAgnostic extends ConnectionAgnostic with PreparedStatementSupport wi
           createRequest,
           sqlCreate,
           filloutPsCreate,
-          resultSetExtractId) fold (
+          resultSetExtractId,
+          args) fold (
           error => {
             logger.error(s"create | error: $error")
             closeWithoutCommit(connection)
@@ -47,7 +49,8 @@ trait CreateAgnostic extends ConnectionAgnostic with PreparedStatementSupport wi
     createRequest: R,
     sqlCreate: String,
     filloutPsCreate: (PreparedStatement, R) => Either[String, PreparedStatement],
-    resultSetExtractId: ResultSet => Either[String, I]): Either[String, I] = {
+    resultSetExtractId: (ResultSet, Seq[String]) => Either[String, I],
+    args: Seq[String]): Either[String, I] = {
 
     if (logger.isInfoEnabled) logger.info(s"create|enter, \n\t- $createRequest\n\t- $sqlCreate")
     val prepStat =
@@ -64,7 +67,7 @@ trait CreateAgnostic extends ConnectionAgnostic with PreparedStatementSupport wi
       },
       affectedRows => {
         if (logger.isInfoEnabled) logger.info(s"create|insert done, affectedRows: $affectedRows")
-        getGenKey[I](prepStat, resultSetExtractId) map (
+        getGenKey[I](prepStat, args, resultSetExtractId) map (
           entityId => {
             close(prepStat)
             Right(entityId)
