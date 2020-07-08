@@ -133,4 +133,10 @@ trait CloseResourceAgnostic {
     someType
   }
 
+  def closeWithoutCommitAndReturnSomething[T](connection: Connection, someType: T): T = {
+    closeWithoutCommit(connection)
+    craLogger.info(s"closeWithoutCommitAndReturnSomething() - $someType")
+    someType
+  }
+
 }

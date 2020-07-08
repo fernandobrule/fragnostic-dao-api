@@ -24,24 +24,13 @@ trait FindPageAgnostic extends ConnectionAgnostic with PreparedStatementSupport 
     sqlFindPage: String,
     newRow: (ResultSet, Seq[String]) => Either[String, P],
     args: Seq[String] = Nil): Either[String, (Long, String, Long, Long, List[Int], Long, Long, Long, List[P], Boolean)] =
-    getConnection map (
-      connection => {
-        if (logger.isInfoEnabled) logger.info(s"findPage enter")
-        val eith = findPageCountTotalRows(
-          connection,
-          numPage,
-          nummaxBadgets,
-          orderBy,
-          rowsPerPg,
-          optPrmsCount,
-          optPrmsPage,
-          sqlCountTotalRows,
-          sqlFindPage,
-          newRow,
-          args)
-        closeWithoutCommit(connection)
-        eith
-      }) getOrElse Left("agnostic.dao.find.page.error.db.nc")
+    getConnection map (connection => {
+      if (logger.isInfoEnabled) logger.info(s"findPage enter")
+      val eith =
+        validate(connection, numPage, nummaxBadgets, orderBy, rowsPerPg, optPrmsCount, optPrmsPage, sqlCountTotalRows, sqlFindPage, newRow, args)
+      closeWithoutCommit(connection)
+      eith
+    }) getOrElse Left("agnostic.dao.find.page.error.db.nc")
 
   def findPage[P](
     connection: Connection,
@@ -55,18 +44,26 @@ trait FindPageAgnostic extends ConnectionAgnostic with PreparedStatementSupport 
     sqlFindPage: String,
     newRow: (ResultSet, Seq[String]) => Either[String, P],
     args: Seq[String]): Either[String, (Long, String, Long, Long, List[Int], Long, Long, Long, List[P], Boolean)] =
-    findPageCountTotalRows(
-      connection,
-      numPage,
-      nummaxBadgets,
-      orderBy,
-      rowsPerPg,
-      prmsCount,
-      prmsPage,
-      sqlCountTotalRows,
-      sqlFindPage,
-      newRow,
-      args)
+    validate(connection, numPage, nummaxBadgets, orderBy, rowsPerPg, prmsCount, prmsPage, sqlCountTotalRows, sqlFindPage, newRow, args)
+
+  private def validate[P](
+    connection: Connection,
+    numPage: Int,
+    nummaxBadgets: Short,
+    orderBy: String,
+    rowsPerPg: Int,
+    prmsCount: Map[Int, (String, String)],
+    prmsPage: Map[Int, (String, String)],
+    sqlCountTotalRows: String,
+    sqlFindPage: String,
+    newRow: (ResultSet, Seq[String]) => Either[String, P],
+    args: Seq[String]): Either[String, (Long, String, Long, Long, List[Int], Long, Long, Long, List[P], Boolean)] = {
+
+    if (numPage < 1) Left("find.page.agnostic.error.num.page.not.valid")
+    else if (nummaxBadgets < 1) Left("find.page.agnostic.error.num.max.badgets.not.valid")
+    else if (rowsPerPg < 1) Left("find.page.agnostic.error.rows.per.page.not.valid")
+    else findPageCountTotalRows(connection, numPage, nummaxBadgets, orderBy, rowsPerPg, prmsCount, prmsPage, sqlCountTotalRows, sqlFindPage, newRow, args)
+  }
 
   private def findPageCountTotalRows[P](
     connection: Connection,
@@ -82,18 +79,14 @@ trait FindPageAgnostic extends ConnectionAgnostic with PreparedStatementSupport 
     args: Seq[String]): Either[String, (Long, String, Long, Long, List[Int], Long, Long, Long, List[P], Boolean)] = {
 
     val prepStat = connection.prepareStatement(sqlCountTotalRows)
-    setParams(prmsCount, prepStat) fold (
-      errors => Left(errors.mkString(",")),
+    setParams(prmsCount, prepStat) fold (errors => Left(errors.mkString(",")),
       col => {
-        if (logger.isInfoEnabled) logger.info(
-          s"findPageCountTotalRows | parameters are setted..., about to execute query, col: $col")
-        executeQuery(prepStat) fold (
-          error => {
-            close(prepStat)
-            logger.error(
-              s"findPageCountTotalRows | query executed with error: $error \n\tquery: $sqlCountTotalRows \n\t$prmsCount")
-            Left(error)
-          },
+        if (logger.isInfoEnabled) logger.info(s"findPageCountTotalRows | parameters are setted..., about to execute query, col: $col")
+        executeQuery(prepStat) fold (error => {
+          close(prepStat)
+          logger.error(s"findPageCountTotalRows | query executed with error: $error \n\tquery: $sqlCountTotalRows \n\t$prmsCount")
+          Left(error)
+        },
           resultSet => {
             if (logger.isInfoEnabled) logger.info(s"findPageCountTotalRows | query executed 1")
             if (resultSet.next()) {
@@ -101,20 +94,9 @@ trait FindPageAgnostic extends ConnectionAgnostic with PreparedStatementSupport 
               val totalRows = resultSet.getInt("total_rows")
               if (logger.isInfoEnabled) logger.info(s"findPageCountTotalRows | totalRows: $totalRows")
               close(resultSet, prepStat)
-              findPage(
-                connection,
-                numPage,
-                nummaxBadgets,
-                orderBy,
-                rowsPerPg,
-                prmsPage,
-                sqlFindPage,
-                totalRows,
-                newRow,
-                args)
+              findPage(connection, numPage, nummaxBadgets, orderBy, rowsPerPg, prmsPage, sqlFindPage, totalRows, newRow, args)
             } else {
-              if (logger.isInfoEnabled) logger.info(
-                s"findPageCountTotalRows | totalRows: 0, empty set...")
+              if (logger.isInfoEnabled) logger.info(s"findPageCountTotalRows | totalRows: 0, empty set...")
               close(resultSet, prepStat)
               Right((0, "", 0, 0, Nil, 0, 0, 0, Nil, true): (Long, String, Long, Long, List[Int], Long, Long, Long, List[P], Boolean))
             }
@@ -122,26 +104,18 @@ trait FindPageAgnostic extends ConnectionAgnostic with PreparedStatementSupport 
       })
   }
 
-  private def addRow[P](
-    resultSet: ResultSet,
-    newRow: (ResultSet, Seq[String]) => Either[String, P],
-    args: Seq[String]): List[P] =
+  private def addRow[P](resultSet: ResultSet, newRow: (ResultSet, Seq[String]) => Either[String, P], args: Seq[String]): List[P] =
     if (resultSet.next())
-      newRow(resultSet, args) fold (
-        error => {
-          logger.error(s"addRow() - $error")
-          addRow(resultSet, newRow, args)
-        },
+      newRow(resultSet, args) fold (error => {
+        logger.error(s"addRow() - $error")
+        addRow(resultSet, newRow, args)
+      },
         row => row :: addRow(resultSet, newRow, args))
     else {
       Nil
     }
 
-  private def getRows[P](
-    prepStat: PreparedStatement,
-    resultSet: ResultSet,
-    newRow: (ResultSet, Seq[String]) => Either[String, P],
-    args: Seq[String]) =
+  private def getRows[P](prepStat: PreparedStatement, resultSet: ResultSet, newRow: (ResultSet, Seq[String]) => Either[String, P], args: Seq[String]) =
     try {
       val rows = addRow(resultSet, newRow, args)
       close(resultSet, prepStat)
@@ -173,45 +147,31 @@ trait FindPageAgnostic extends ConnectionAgnostic with PreparedStatementSupport 
     val numPages: Int = getNumPages(numRows, rowsPerPg)
     val numPage = getNumPage(numPageAparente, numPages)
     val idx = (numPage - 1) * rowsPerPg
-    if (logger.isInfoEnabled) logger.info(
-      s"findPage | numPage: $numPage de numPages: $numPages, interval: $idx ~ $rowsPerPg")
+    if (logger.isInfoEnabled) logger.info(s"findPage | numPage: $numPage de numPages: $numPages, interval: $idx ~ $rowsPerPg")
     val prepStat = connection.prepareStatement(sqlFindPage)
-    setParams(optPrmsPage, prepStat) fold (
-      errors => {
-        close(prepStat)
-        Left(errors.mkString(", "))
-      },
+    setParams(optPrmsPage, prepStat) fold (errors => {
+      close(prepStat)
+      Left(errors.mkString(", "))
+    },
       col => {
         prepStat.setInt(col + 1, idx)
         prepStat.setInt(col + 2, rowsPerPg)
-        if (logger.isInfoEnabled) logger.info(
-          s"findPage | parameters are setted..., limit 1:$idx, limit 2:$rowsPerPg, about to execute query")
-        executeQuery(prepStat) fold (
-          error => {
-            close(prepStat)
-            logger.error(s"findPage | query executed with error: $error")
-            Left(error)
-          },
+        if (logger.isInfoEnabled) logger.info(s"findPage | parameters are setted..., limit 1:$idx, limit 2:$rowsPerPg, about to execute query")
+        executeQuery(prepStat) fold (error => {
+          close(prepStat)
+          logger.error(s"findPage | query executed with error: $error")
+          Left(error)
+        },
           resultSet => {
 
             if (logger.isInfoEnabled) logger.info(s"findPage | query executed 2")
 
-            getRows(prepStat, resultSet, newRow, args) fold (
-              error => Left(error),
+            getRows(prepStat, resultSet, newRow, args) fold (error => Left(error),
               list =>
                 if (list.nonEmpty) {
                   val linksLimits = getPageLinks(numPage, numPages, nummaxBadgets)
-                  Right((
-                    numPage,
-                    orderBy,
-                    linksLimits._1,
-                    linksLimits._2,
-                    linksLimits._3,
-                    rowsPerPg,
-                    numRows,
-                    numPages,
-                    list,
-                    list.isEmpty): (Long, String, Long, Long, List[Int], Long, Long, Long, List[P], Boolean))
+                  Right(
+                    (numPage, orderBy, linksLimits._1, linksLimits._2, linksLimits._3, rowsPerPg, numRows, numPages, list, list.isEmpty): (Long, String, Long, Long, List[Int], Long, Long, Long, List[P], Boolean))
                 } else Right((0, "", 0, 0, Nil, 0, 0, 0, Nil, true): (Long, String, Long, Long, List[Int], Long, Long, Long, List[P], Boolean)))
           })
 

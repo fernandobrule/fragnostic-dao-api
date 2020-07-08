@@ -12,10 +12,11 @@ trait JdbcGeneratedKeysAgnostic extends CloseResourceAgnostic {
 
   private[this] val logger: Logger = LoggerFactory.getLogger(getClass.getName)
 
-  def getLongGenKey(prepStat: PreparedStatement): Option[Long] =
+  def getLongGenKey(prepStat: PreparedStatement, args: Seq[String]): Option[Long] =
     getGenKey[Long](
       prepStat,
-      (resultSet: ResultSet) => try {
+      args,
+      (resultSet: ResultSet, args: Seq[String]) => try {
         Right(resultSet.getLong(1))
       } catch {
         case e: Exception =>
@@ -25,26 +26,27 @@ trait JdbcGeneratedKeysAgnostic extends CloseResourceAgnostic {
 
   def getGenKey[T](
     prepStat: PreparedStatement,
-    resultSetExtract: ResultSet => Either[String, T]): Option[T] =
-    {
-      val resultSet = prepStat.getGeneratedKeys
-      resultSet.next()
-      resultSetExtract(resultSet) fold (
-        error => {
-          logger.error(s"getGenKey() - $error")
-          None
-        },
-        genKey => {
-          close(resultSet)
-          Some(genKey)
-        })
-    }
+    args: Seq[String],
+    resultSetExtract: (ResultSet, Seq[String]) => Either[String, T]): Option[T] = {
+    val resultSet = prepStat.getGeneratedKeys
+    resultSet.next()
+    resultSetExtract(resultSet, args) fold (
+      error => {
+        logger.error(s"getGenKey() - $error")
+        None
+      },
+      genKey => {
+        close(resultSet)
+        Some(genKey)
+      })
+  }
 
   def getIntGenKey(
-    prepStat: PreparedStatement): Option[Int] =
+    prepStat: PreparedStatement, args: Seq[String]): Option[Int] =
     getGenKey[Int](
       prepStat,
-      (resultSet: ResultSet) => try {
+      args,
+      (resultSet: ResultSet, args: Seq[String]) => try {
         Right(resultSet.getInt(1))
       } catch {
         case e: Exception =>

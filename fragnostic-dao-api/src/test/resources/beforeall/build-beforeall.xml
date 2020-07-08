@@ -1,0 +1,118 @@
+
+<project name="fragnostic dao jdbcimpl mysql" default="usage" basedir=".">
+
+
+  <description>fragnostic dao jdbcimpl mysql beforeall</description>
+
+
+  <property environment="env" />
+  <property file="build-beforeall.properties"/>
+
+
+  <target name="usage">
+    <echo>============================================================</echo>
+    <echo></echo>
+    <echo>   __                                 _   _      </echo>
+    <echo>  / _|                               | | (_)     </echo>
+    <echo> | |_ _ __ __ _  __ _ _ __   ___  ___| |_ _  ___ </echo>
+    <echo> |  _| '__/ _` |/ _` | '_ \ / _ \/ __| __| |/ __|</echo>
+    <echo> | | | | | (_| | (_| | | | | (_) \__ \ |_| | (__ </echo>
+    <echo> |_| |_|  \__,_|\__, |_| |_|\___/|___/\__|_|\___|</echo>
+    <echo>                 __/ |                           </echo>
+    <echo>                |___/                            </echo>
+    <echo></echo>
+    <echo>    This is not mean to be executed by yourself bro!</echo>
+    <echo>    This handles the beforeall event of test life cycle</echo>
+    <echo></echo>
+    <echo>============================================================</echo>
+  </target>
+
+
+   <!-- 
+   - CREATE DB
+   -->
+  <target name="create-db">
+    <sql driver="${driver.class}" 
+         url="${db.root.url}" 
+         userid="${db.root.usr}" 
+         password="${db.root.psw}" 
+         src="scripts/create-db.sql" 
+         print="yes">
+      <classpath>
+        <pathelement location="${driver.location}"/>
+      </classpath>
+    </sql>
+    <echo>-------------------------------------</echo>
+    <echo>SUCCESS: create db done</echo>
+    <echo>-------------------------------------</echo>
+  </target>
+
+
+   <!-- 
+   - CREATE USER
+   -->
+  <target name="create-user">
+    <sql driver="${driver.class}" 
+         url="${db.root.url}" 
+         userid="${db.root.usr}" 
+         password="${db.root.psw}" 
+         src="scripts/create-db-user.sql" 
+         print="yes">
+      <classpath>
+        <pathelement location="${driver.location}"/>
+      </classpath>
+    </sql>
+    <echo>-------------------------------------</echo>
+    <echo>SUCCESS: create user done</echo>
+    <echo>-------------------------------------</echo>
+  </target>
+
+
+   <!-- 
+   - CREATE TEST TABLE
+   -->
+  <target name="create-table">
+    <sql driver="${driver.class}" 
+         url="${db.frg.url}" 
+         userid="${db.frg.usr}" 
+         password="${db.frg.psw}" 
+         src="scripts/create-table.sql" 
+         print="yes">
+      <classpath>
+        <pathelement location="${driver.location}"/>
+      </classpath>
+    </sql>
+    <echo>-------------------------------------</echo>
+    <echo>SUCCESS: create table done</echo>
+    <echo>-------------------------------------</echo>
+  </target>
+
+
+   <!-- 
+   - POPULATE TEST TABLE
+   -->
+  <target name="polpulate-table">
+    <sql driver="${driver.class}" 
+         url="${db.frg.url}" 
+         userid="${db.frg.usr}" 
+         password="${db.frg.psw}" 
+         src="scripts/populate-table.sql" 
+         print="yes">
+      <classpath>
+        <pathelement location="${driver.location}"/>
+      </classpath>
+    </sql>
+    <echo>-------------------------------------</echo>
+    <echo>SUCCESS: populate table done</echo>
+    <echo>-------------------------------------</echo>
+  </target>
+
+
+   <!-- 
+   - BEFORE ALL
+   -->
+  <target name="beforeall" depends="create-db, create-user, create-table, polpulate-table">
+    <echo>Before All Done</echo>
+  </target>
+
+</project>
