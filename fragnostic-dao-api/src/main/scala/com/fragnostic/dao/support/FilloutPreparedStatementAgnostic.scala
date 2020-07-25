@@ -163,4 +163,109 @@ trait FilloutPreparedStatementAgnostic extends DbTypesSupport {
           Left("fillout.ps.with.5.args.error")
       }
 
+  def filloutPsWith6Args[S, T, U, V, W, X]: (PreparedStatement, (S, T, U, V, W, X)) => Either[String, PreparedStatement] =
+    (prepStat: PreparedStatement, request: (S, T, U, V, W, X)) =>
+      try {
+        handle(prepStat, 1, request._1)
+        handle(prepStat, 2, request._2)
+        handle(prepStat, 3, request._3)
+        handle(prepStat, 4, request._4)
+        handle(prepStat, 5, request._5)
+        handle(prepStat, 6, request._6)
+        Right(prepStat)
+      } catch {
+        case e: Exception =>
+          logger.error(s"$e")
+          Left("fillout.ps.with.6.args.error")
+        case e: Throwable =>
+          logger.error(s"$e")
+          Left("fillout.ps.with.6.args.error")
+      }
+
+  def filloutPsWith7Args[R, S, T, U, V, W, X]: (PreparedStatement, (R, S, T, U, V, W, X)) => Either[String, PreparedStatement] =
+    (prepStat: PreparedStatement, request: (R, S, T, U, V, W, X)) =>
+      try {
+        handle(prepStat, 1, request._1)
+        handle(prepStat, 2, request._2)
+        handle(prepStat, 3, request._3)
+        handle(prepStat, 4, request._4)
+        handle(prepStat, 5, request._5)
+        handle(prepStat, 6, request._6)
+        handle(prepStat, 7, request._7)
+        Right(prepStat)
+      } catch {
+        case e: Exception =>
+          logger.error(s"$e")
+          Left("fillout.ps.with.7.args.error")
+        case e: Throwable =>
+          logger.error(s"$e")
+          Left("fillout.ps.with.7.args.error")
+      }
+
+  def filloutPsWith8Args[Q, R, S, T, U, V, W, X]: (PreparedStatement, (Q, R, S, T, U, V, W, X)) => Either[String, PreparedStatement] =
+    (prepStat: PreparedStatement, request: (Q, R, S, T, U, V, W, X)) =>
+      try {
+        handle(prepStat, 1, request._1)
+        handle(prepStat, 2, request._2)
+        handle(prepStat, 3, request._3)
+        handle(prepStat, 4, request._4)
+        handle(prepStat, 5, request._5)
+        handle(prepStat, 6, request._6)
+        handle(prepStat, 7, request._7)
+        handle(prepStat, 8, request._8)
+        Right(prepStat)
+      } catch {
+        case e: Exception =>
+          logger.error(s"$e")
+          Left("fillout.ps.with.8.args.error")
+        case e: Throwable =>
+          logger.error(s"$e")
+          Left("fillout.ps.with.8.args.error")
+      }
+
+  def filloutPsWith9Args[P, Q, R, S, T, U, V, W, X]: (PreparedStatement, (P, Q, R, S, T, U, V, W, X)) => Either[String, PreparedStatement] =
+    (prepStat: PreparedStatement, request: (P, Q, R, S, T, U, V, W, X)) =>
+      try {
+        handle(prepStat, 1, request._1)
+        handle(prepStat, 2, request._2)
+        handle(prepStat, 3, request._3)
+        handle(prepStat, 4, request._4)
+        handle(prepStat, 5, request._5)
+        handle(prepStat, 6, request._6)
+        handle(prepStat, 7, request._7)
+        handle(prepStat, 8, request._8)
+        handle(prepStat, 9, request._9)
+        Right(prepStat)
+      } catch {
+        case e: Exception =>
+          logger.error(s"$e")
+          Left("fillout.ps.with.9.args.error")
+        case e: Throwable =>
+          logger.error(s"$e")
+          Left("fillout.ps.with.9.args.error")
+      }
+
+  def filloutPsWith10Args[O, P, Q, R, S, T, U, V, W, X]: (PreparedStatement, (O, P, Q, R, S, T, U, V, W, X)) => Either[String, PreparedStatement] =
+    (prepStat: PreparedStatement, request: (O, P, Q, R, S, T, U, V, W, X)) =>
+      try {
+        handle(prepStat, 1, request._1)
+        handle(prepStat, 2, request._2)
+        handle(prepStat, 3, request._3)
+        handle(prepStat, 4, request._4)
+        handle(prepStat, 5, request._5)
+        handle(prepStat, 6, request._6)
+        handle(prepStat, 7, request._7)
+        handle(prepStat, 8, request._8)
+        handle(prepStat, 9, request._9)
+        handle(prepStat, 10, request._10)
+        Right(prepStat)
+      } catch {
+        case e: Exception =>
+          logger.error(s"$e")
+          Left("fillout.ps.with.10.args.error")
+        case e: Throwable =>
+          logger.error(s"$e")
+          Left("fillout.ps.with.10.args.error")
+      }
+
 }
