@@ -62,6 +62,7 @@ trait FilloutPreparedStatementAgnostic extends DbTypesSupport {
 
   private def handle[T](p: PreparedStatement, parameterIndex: Int, t: T): Unit = {
     t match {
+      case bol: Boolean => p.setBoolean(parameterIndex, bol)
       case shr: Short => p.setShort(parameterIndex, shr)
       case int: Int => p.setInt(parameterIndex, int)
       case lng: Long => p.setLong(parameterIndex, lng)
