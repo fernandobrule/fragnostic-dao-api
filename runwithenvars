@@ -14,7 +14,4 @@ echo ""
 
 export MYSQL8_DATASOURCE_PROPERTY_FILE_NAME=fragnostic-dao-api/src/test/resources/fragnostic-dao-api-test.properties
 
-
-
-
-./sbt -v -213
+./sbt -v -213 -Dsbt.io.implicit.relative.glob.conversion=allow
