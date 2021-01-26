@@ -70,6 +70,7 @@ trait FilloutPreparedStatementAgnostic extends DbTypesSupport {
       case str: String => p.setString(parameterIndex, str)
       case flt: Float => p.setFloat(parameterIndex, flt)
       case tms: Timestamp => p.setTimestamp(parameterIndex, tms)
+      case bool: Boolean => p.setBoolean(parameterIndex, bool)
       case utilDate: Date =>
         utilDate2sqlDate(utilDate) fold (
           error => {
