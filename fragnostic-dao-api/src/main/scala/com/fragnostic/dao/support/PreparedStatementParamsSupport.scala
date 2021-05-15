@@ -16,9 +16,6 @@ trait PreparedStatementParamsSupport extends StatementTypeHandler {
   def setParams(
     prmsCount: Map[Int, (String, String)],
     prepStat: PreparedStatement): Either[List[String], Int] = {
-    if (logger.isInfoEnabled) logger.info(s"setParams | enter")
-
-    if (logger.isInfoEnabled) logger.info(s"setParams | params:$prmsCount")
     val errors = handleIterator(
       prmsCount.keysIterator,
       prmsCount,
@@ -39,7 +36,6 @@ trait PreparedStatementParamsSupport extends StatementTypeHandler {
     numParam: Int,
     prmsCount: Map[Int, (String, String)],
     prepStat: PreparedStatement): String = {
-    if (logger.isInfoEnabled) logger.info(s"handleNumParam | enter, numParam:$numParam")
     handle(prmsCount(numParam)._1) fold (
       error => {
         logger.error(s"handleNumParam | $error")
@@ -47,7 +43,6 @@ trait PreparedStatementParamsSupport extends StatementTypeHandler {
       },
       handler =>
         try {
-          if (logger.isInfoEnabled) logger.info(s"handleNumParam | have handler, numParam:$numParam")
           handler(prepStat, numParam, prmsCount)
           OK
         } catch {
@@ -67,9 +62,7 @@ trait PreparedStatementParamsSupport extends StatementTypeHandler {
     iterator: Iterator[Int],
     prmsCount: Map[Int, (String, String)],
     prepStat: PreparedStatement): List[String] = {
-    if (logger.isInfoEnabled) logger.info(s"handleIterator | enter")
     if (iterator.hasNext) {
-      if (logger.isInfoEnabled) logger.info(s"handleIterator | have next")
       handleNumParam(iterator.next(), prmsCount, prepStat) :: handleIterator(
         iterator,
         prmsCount,

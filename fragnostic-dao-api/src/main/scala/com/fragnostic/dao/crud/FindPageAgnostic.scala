@@ -25,7 +25,6 @@ trait FindPageAgnostic extends ConnectionAgnostic with PreparedStatementSupport 
     newRow: (ResultSet, Seq[String]) => Either[String, P],
     args: Seq[String] = Nil): Either[String, (Long, String, Long, Long, List[Int], Long, Long, Long, List[P], Boolean)] =
     getConnection map (connection => {
-      if (logger.isInfoEnabled) logger.info(s"findPage enter")
       val eith =
         validate(connection, numPage, nummaxBadgets, orderBy, rowsPerPg, optPrmsCount, optPrmsPage, sqlCountTotalRows, sqlFindPage, newRow, args)
       closeWithoutCommit(connection)
@@ -81,22 +80,17 @@ trait FindPageAgnostic extends ConnectionAgnostic with PreparedStatementSupport 
     val prepStat = connection.prepareStatement(sqlCountTotalRows)
     setParams(prmsCount, prepStat) fold (errors => Left(errors.mkString(",")),
       col => {
-        if (logger.isInfoEnabled) logger.info(s"findPageCountTotalRows | parameters are setted..., about to execute query, col: $col")
         executeQuery(prepStat) fold (error => {
           close(prepStat)
           logger.error(s"findPageCountTotalRows | query executed with error: $error \n\tquery: $sqlCountTotalRows \n\t$prmsCount")
           Left(error)
         },
           resultSet => {
-            if (logger.isInfoEnabled) logger.info(s"findPageCountTotalRows | query executed 1")
             if (resultSet.next()) {
-              if (logger.isInfoEnabled) logger.info(s"findPageCountTotalRows | next")
               val totalRows = resultSet.getInt("total_rows")
-              if (logger.isInfoEnabled) logger.info(s"findPageCountTotalRows | totalRows: $totalRows")
               close(resultSet, prepStat)
               findPage(connection, numPage, nummaxBadgets, orderBy, rowsPerPg, prmsPage, sqlFindPage, totalRows, newRow, args)
             } else {
-              if (logger.isInfoEnabled) logger.info(s"findPageCountTotalRows | totalRows: 0, empty set...")
               close(resultSet, prepStat)
               Right((0, "", 0, 0, Nil, 0, 0, 0, Nil, true): (Long, String, Long, Long, List[Int], Long, Long, Long, List[P], Boolean))
             }
@@ -147,7 +141,6 @@ trait FindPageAgnostic extends ConnectionAgnostic with PreparedStatementSupport 
     val numPages: Int = getNumPages(numRows, rowsPerPg)
     val numPage = getNumPage(numPageAparente, numPages)
     val idx = (numPage - 1) * rowsPerPg
-    if (logger.isInfoEnabled) logger.info(s"findPage | numPage: $numPage de numPages: $numPages, interval: $idx ~ $rowsPerPg")
     val prepStat = connection.prepareStatement(sqlFindPage)
     setParams(optPrmsPage, prepStat) fold (errors => {
       close(prepStat)
@@ -156,24 +149,20 @@ trait FindPageAgnostic extends ConnectionAgnostic with PreparedStatementSupport 
       col => {
         prepStat.setInt(col + 1, idx)
         prepStat.setInt(col + 2, rowsPerPg)
-        if (logger.isInfoEnabled) logger.info(s"findPage | parameters are setted..., limit 1:$idx, limit 2:$rowsPerPg, about to execute query")
         executeQuery(prepStat) fold (error => {
           close(prepStat)
           logger.error(s"findPage | query executed with error: $error")
           Left(error)
         },
-          resultSet => {
-
-            if (logger.isInfoEnabled) logger.info(s"findPage | query executed 2")
-
+          resultSet =>
             getRows(prepStat, resultSet, newRow, args) fold (error => Left(error),
               list =>
                 if (list.nonEmpty) {
                   val linksLimits = getPageLinks(numPage, numPages, nummaxBadgets)
                   Right(
                     (numPage, orderBy, linksLimits._1, linksLimits._2, linksLimits._3, rowsPerPg, numRows, numPages, list, list.isEmpty): (Long, String, Long, Long, List[Int], Long, Long, Long, List[P], Boolean))
-                } else Right((0, "", 0, 0, Nil, 0, 0, 0, Nil, true): (Long, String, Long, Long, List[Int], Long, Long, Long, List[P], Boolean)))
-          })
+                } else Right((0, "", 0, 0, Nil, 0, 0, 0, Nil, true): (Long, String, Long, Long, List[Int], Long, Long, Long, List[P], Boolean))) //
+        )
 
       })
 
