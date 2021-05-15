@@ -17,7 +17,6 @@ trait ConnectionAgnostic {
 
   def getConnection: Either[String, Connection] =
     try {
-      if (logger.isInfoEnabled) logger.info(s"getConnection | enter")
       val connection = dataSource.getConnection
       connection.setAutoCommit(false)
       Right(connection)

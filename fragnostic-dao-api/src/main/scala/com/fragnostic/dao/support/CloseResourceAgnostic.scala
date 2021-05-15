@@ -10,21 +10,20 @@ import org.slf4j.{ Logger, LoggerFactory }
  */
 trait CloseResourceAgnostic {
 
-  private[this] val craLogger: Logger = LoggerFactory.getLogger(getClass.getName)
+  private[this] val logger: Logger = LoggerFactory.getLogger(getClass.getName)
 
   def closeWithoutCommit(connection: Connection): Unit =
     try {
       connection.close()
-      if (craLogger.isInfoEnabled) craLogger.info("closeWithoutCommit() - Connection closed")
     } catch {
       case e: SQLException =>
-        craLogger.error(
+        logger.error(
           s"close.resource.agnostic.error.close.without.commit (${e.getMessage})")
       case e: Exception =>
-        craLogger.error(
+        logger.error(
           s"close.resource.agnostic.error.close.without.commit (${e.getMessage})")
       case e: Throwable =>
-        craLogger.error(
+        logger.error(
           s"close.resource.agnostic.error.close.without.commit (${e.getMessage})")
     }
 
@@ -32,16 +31,15 @@ trait CloseResourceAgnostic {
     try {
       connection.commit()
       connection.close()
-      if (craLogger.isInfoEnabled) craLogger.info("closeWithCommit() - Connection commited and closed")
     } catch {
       case e: SQLException =>
-        craLogger.error(
+        logger.error(
           s"close.resource.agnostic.error.close.with.commit (${e.getMessage})")
       case e: Exception =>
-        craLogger.error(
+        logger.error(
           s"close.resource.agnostic.error.close.with.commit (${e.getMessage})")
       case e: Throwable =>
-        craLogger.error(
+        logger.error(
           s"close.resource.agnostic.error.close.with.commit (${e.getMessage})")
     }
 
@@ -49,64 +47,60 @@ trait CloseResourceAgnostic {
     try {
       connection.rollback()
       connection.close()
-      if (craLogger.isInfoEnabled) craLogger.info("closeWithRollBack() - Connection Rolled Back and Closed")
     } catch {
       case e: SQLException =>
-        craLogger.error(
+        logger.error(
           s"close.resource.agnostic.error.close.with.roollback (${e.getMessage})")
       case e: Exception =>
-        craLogger.error(
+        logger.error(
           s"close.resource.agnostic.error.close.with.roollback (${e.getMessage})")
       case e: Throwable =>
-        craLogger.error(
+        logger.error(
           s"close.resource.agnostic.error.close.with.roollback (${e.getMessage})")
     }
 
   def close(statement: Statement): Unit =
     try {
       statement.close()
-      if (craLogger.isInfoEnabled) craLogger.info("close() - Statement Closed")
     } catch {
       case e: SQLException =>
-        craLogger.error(
+        logger.error(
           s"close.resource.agnostic.error.close.statement (${e.getMessage})")
       case e: Exception =>
-        craLogger.error(
+        logger.error(
           s"close.resource.agnostic.error.close.statement (${e.getMessage})")
       case e: Throwable =>
-        craLogger.error(
+        logger.error(
           s"close.resource.agnostic.error.close.statement (${e.getMessage})")
     }
 
   def close(prepStat: PreparedStatement): Unit =
     try {
       prepStat.close()
-      if (craLogger.isInfoEnabled) craLogger.info("close() - PreparedStatement Closed")
     } catch {
       case e: SQLException =>
-        craLogger.error(
+        logger.error(
           s"close.resource.agnostic.error.close.prepared.statement (${e.getMessage})")
       case e: Exception =>
-        craLogger.error(
+        logger.error(
           s"close.resource.agnostic.error.close.prepared.statement (${e.getMessage})")
       case e: Throwable =>
-        craLogger.error(
+        logger.error(
           s"close.resource.agnostic.error.close.prepared.statement (${e.getMessage})")
     }
 
   def close(resultSet: ResultSet): Unit =
     try {
       resultSet.close()
-      if (craLogger.isInfoEnabled) craLogger.info("close() - ResultSet Closed")
     } catch {
       case e: SQLException =>
-        craLogger.error(
+        logger.error(
           s"close.resource.agnostic.error.close.resultset (${e.getMessage})")
       case e: Exception =>
-        craLogger.error(
+        logger.error(
           s"close.resource.agnostic.error.close.resultset (${e.getMessage})")
       case e: Throwable =>
-        craLogger.error(
+        logger.error(
           s"close.resource.agnostic.error.close.resultset (${e.getMessage})")
     }
 
@@ -117,25 +111,21 @@ trait CloseResourceAgnostic {
 
   def closeWithoutCommitAndReturnNone(connection: Connection): Option[Nothing] = {
     closeWithoutCommit(connection)
-    if (craLogger.isInfoEnabled) craLogger.info(s"closeWithoutCommitAndReturnNone() - None")
     None
   }
 
   def closeWithoutCommitAndReturnError(connection: Connection, error: String): String = {
     closeWithoutCommit(connection)
-    if (craLogger.isInfoEnabled) craLogger.info(s"closeWithoutCommitAndReturnError() - $error")
     error
   }
 
   def closeWithCommitAndReturnSomething[T](connection: Connection, someType: T): T = {
     closeWithCommit(connection)
-    craLogger.info(s"closeWithCommitAndReturnSomething() - $someType")
     someType
   }
 
   def closeWithoutCommitAndReturnSomething[T](connection: Connection, someType: T): T = {
     closeWithoutCommit(connection)
-    craLogger.info(s"closeWithoutCommitAndReturnSomething() - $someType")
     someType
   }
 

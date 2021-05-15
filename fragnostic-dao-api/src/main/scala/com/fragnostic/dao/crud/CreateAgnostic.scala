@@ -52,12 +52,9 @@ trait CreateAgnostic extends ConnectionAgnostic with PreparedStatementSupport wi
     resultSetExtractId: (ResultSet, Seq[String]) => Either[String, I],
     args: Seq[String]): Either[String, I] = {
 
-    if (logger.isInfoEnabled) logger.info(s"create|enter, \n\t- $createRequest\n\t- $sqlCreate")
     val prepStat =
       connection.prepareStatement(sqlCreate, Statement.RETURN_GENERATED_KEYS)
-    if (logger.isInfoEnabled) logger.info(s"create|prepared statement ok")
     filloutPsCreate(prepStat, createRequest)
-    if (logger.isInfoEnabled) logger.info(s"create|ps filled with data")
     executeUpdate(prepStat) fold (
       error => {
         logger.error(
@@ -66,7 +63,6 @@ trait CreateAgnostic extends ConnectionAgnostic with PreparedStatementSupport wi
         Left("create.agnostic.error.execute.update")
       },
       affectedRows => {
-        if (logger.isInfoEnabled) logger.info(s"create|insert done, affectedRows: $affectedRows")
         getGenKey[I](prepStat, args, resultSetExtractId) map (
           entityId => {
             close(prepStat)

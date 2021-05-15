@@ -63,9 +63,7 @@ trait DeleteByIdAgnostic extends ConnectionAgnostic with PreparedStatementSuppor
     entityId: I,
     sqlDeleteById: String,
     filloutPsDelete: (PreparedStatement, I) => Either[String, PreparedStatement]): Either[String, Int] = {
-    if (logger.isInfoEnabled) logger.info(s"deleteById|enter, about to prepare statement...")
     val prepStat = connection.prepareStatement(sqlDeleteById)
-    if (logger.isInfoEnabled) logger.info(s"deleteById|statement ready")
     filloutPsDelete(prepStat, entityId)
     executeUpdate(prepStat) fold (
       error => {
