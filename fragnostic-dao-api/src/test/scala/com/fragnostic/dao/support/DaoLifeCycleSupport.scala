@@ -35,7 +35,7 @@ trait DaoLifeCycleSupport extends FunSpec with Matchers with BeforeAndAfterAll w
     }
 
   def getDataSource: Either[String, MysqlDataSource] =
-    CakeConfEnvService.confServiceApi
+    CakeConfEnvService.confEnvService
       .getString(key = MYSQL8_DATASOURCE_PROPERTY_FILE_NAME)
       .fold(
         error => {
