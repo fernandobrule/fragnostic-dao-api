@@ -1,7 +1,8 @@
 package com.fragnostic.dao.crud
 
-import java.sql.{ Connection, PreparedStatement, ResultSet, SQLException }
+import com.fragnostic.dao.glue.Page
 
+import java.sql.{ Connection, PreparedStatement, ResultSet, SQLException }
 import com.fragnostic.dao.support.{ ConnectionAgnostic, PageSupport, PreparedStatementParamsSupport, PreparedStatementSupport }
 import org.slf4j.{ Logger, LoggerFactory }
 
@@ -23,7 +24,7 @@ trait FindPageAgnostic extends ConnectionAgnostic with PreparedStatementSupport 
     sqlCountTotalRows: String,
     sqlFindPage: String,
     newRow: (ResultSet, Seq[String]) => Either[String, P],
-    args: Seq[String] = Nil): Either[String, (Long, String, Long, Long, List[Int], Long, Long, Long, List[P], Boolean)] =
+    args: Seq[String] = Nil): Either[String, Page[P]] =
     getConnection map (connection => {
       val eith =
         validate(connection, numPage, nummaxBadgets, orderBy, rowsPerPg, optPrmsCount, optPrmsPage, sqlCountTotalRows, sqlFindPage, newRow, args)
@@ -42,7 +43,7 @@ trait FindPageAgnostic extends ConnectionAgnostic with PreparedStatementSupport 
     sqlCountTotalRows: String,
     sqlFindPage: String,
     newRow: (ResultSet, Seq[String]) => Either[String, P],
-    args: Seq[String]): Either[String, (Long, String, Long, Long, List[Int], Long, Long, Long, List[P], Boolean)] =
+    args: Seq[String]): Either[String, Page[P]] =
     validate(connection, numPage, nummaxBadgets, orderBy, rowsPerPg, prmsCount, prmsPage, sqlCountTotalRows, sqlFindPage, newRow, args)
 
   private def validate[P](
@@ -56,7 +57,7 @@ trait FindPageAgnostic extends ConnectionAgnostic with PreparedStatementSupport 
     sqlCountTotalRows: String,
     sqlFindPage: String,
     newRow: (ResultSet, Seq[String]) => Either[String, P],
-    args: Seq[String]): Either[String, (Long, String, Long, Long, List[Int], Long, Long, Long, List[P], Boolean)] = {
+    args: Seq[String]): Either[String, Page[P]] = {
 
     if (numPage < 1) Left("find.page.agnostic.error.num.page.not.valid")
     else if (nummaxBadgets < 1) Left("find.page.agnostic.error.num.max.badgets.not.valid")
@@ -75,7 +76,7 @@ trait FindPageAgnostic extends ConnectionAgnostic with PreparedStatementSupport 
     sqlCountTotalRows: String,
     sqlFindPage: String,
     newRow: (ResultSet, Seq[String]) => Either[String, P],
-    args: Seq[String]): Either[String, (Long, String, Long, Long, List[Int], Long, Long, Long, List[P], Boolean)] = {
+    args: Seq[String]): Either[String, Page[P]] = {
 
     val prepStat = connection.prepareStatement(sqlCountTotalRows)
     setParams(prmsCount, prepStat) fold (errors => Left(errors.mkString(",")),
@@ -92,7 +93,7 @@ trait FindPageAgnostic extends ConnectionAgnostic with PreparedStatementSupport 
               findPage(connection, numPage, nummaxBadgets, orderBy, rowsPerPg, prmsPage, sqlFindPage, totalRows, newRow, args)
             } else {
               close(resultSet, prepStat)
-              Right((0, "", 0, 0, Nil, 0, 0, 0, Nil, true): (Long, String, Long, Long, List[Int], Long, Long, Long, List[P], Boolean))
+              Right(Page(0, "", 0, 0, Nil, 0, 0, 0, Nil, true): Page[P])
             }
           })
       })
@@ -136,7 +137,7 @@ trait FindPageAgnostic extends ConnectionAgnostic with PreparedStatementSupport 
     sqlFindPage: String,
     numRows: Int,
     newRow: (ResultSet, Seq[String]) => Either[String, P],
-    args: Seq[String]): Either[String, (Long, String, Long, Long, List[Int], Long, Long, Long, List[P], Boolean)] = {
+    args: Seq[String]): Either[String, Page[P]] = {
 
     val numPages: Int = getNumPages(numRows, rowsPerPg)
     val numPage = getNumPage(numPageAparente, numPages)
@@ -160,8 +161,8 @@ trait FindPageAgnostic extends ConnectionAgnostic with PreparedStatementSupport 
                 if (list.nonEmpty) {
                   val linksLimits = getPageLinks(numPage, numPages, nummaxBadgets)
                   Right(
-                    (numPage, orderBy, linksLimits._1, linksLimits._2, linksLimits._3, rowsPerPg, numRows, numPages, list, list.isEmpty): (Long, String, Long, Long, List[Int], Long, Long, Long, List[P], Boolean))
-                } else Right((0, "", 0, 0, Nil, 0, 0, 0, Nil, true): (Long, String, Long, Long, List[Int], Long, Long, Long, List[P], Boolean))) //
+                    Page(numPage, orderBy, linksLimits._1, linksLimits._2, linksLimits._3, rowsPerPg, numRows, numPages, list, list.isEmpty): Page[P])
+                } else Right(Page(0, "", 0, 0, Nil, 0, 0, 0, Nil, true): Page[P])) //
         )
 
       })
