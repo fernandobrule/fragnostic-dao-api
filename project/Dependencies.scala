@@ -8,8 +8,7 @@ object Dependencies {
   lazy val scalatest = "org.scalatest" %% "scalatest" % "3.0.8" % "test"
   lazy val mysql8JavaClient = "mysql" % "mysql-connector-java" % "8.0.18" % "test"
 
-
-  lazy val fragnosticSupport = "com.fragnostic" % "fragnostic-support_2.13" % "0.1.16" % "test"
-  lazy val fragnosticConfEnv = "com.fragnostic" % "fragnostic-conf-env_2.13" % "0.1.4" % "test"
+  lazy val fragnosticSupport = "com.fragnostic" % "fragnostic-support_2.13" % "0.1.17" % "test"
+  lazy val fragnosticConfEnv = "com.fragnostic" % "fragnostic-conf-env_2.13" % "0.1.5" % "test"
 
 }
