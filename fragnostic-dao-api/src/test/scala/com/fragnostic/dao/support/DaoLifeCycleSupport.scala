@@ -5,14 +5,18 @@ import java.util.Properties
 import com.fragnostic.conf.env.service.CakeConfEnvService
 import com.fragnostic.support.FilesSupport
 import com.mysql.cj.jdbc.MysqlDataSource
-import org.scalatest.{ BeforeAndAfterAll, FunSpec, Matchers }
+import org.scalatest.{ BeforeAndAfterAll }
+
+import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.should.Matchers
+
 import org.slf4j.{ Logger, LoggerFactory }
 
 import scala.language.postfixOps
 import scala.sys.process._
 import scala.util.{ Failure, Success, Try }
 
-trait DaoLifeCycleSupport extends FunSpec with Matchers with BeforeAndAfterAll with FilesSupport {
+trait DaoLifeCycleSupport extends AnyFunSpec with Matchers with BeforeAndAfterAll with FilesSupport {
 
   private val MYSQL8_DATASOURCE_PROPERTY_FILE_NAME = "MYSQL8_DATASOURCE_PROPERTY_FILE_NAME"
 

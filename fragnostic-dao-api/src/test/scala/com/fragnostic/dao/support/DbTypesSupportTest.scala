@@ -2,9 +2,10 @@ package com.fragnostic.dao.support
 
 import java.time.LocalDateTime
 
-import org.scalatest.{ FunSpec, Matchers }
+import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.should.Matchers
 
-class DbTypesSupportTest extends FunSpec with Matchers with DbTypesSupport {
+class DbTypesSupportTest extends AnyFunSpec with Matchers with DbTypesSupport {
 
   describe("Db Types Support Test") {
 
