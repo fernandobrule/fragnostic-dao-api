@@ -1,11 +1,10 @@
 package com.fragnostic.dao.support
 
+import org.scalatest.funspec.AnyFunSpec
+
 import java.time.LocalDateTime
 
-import org.scalatest.funspec.AnyFunSpec
-import org.scalatest.matchers.should.Matchers
-
-class DbTypesSupportTest extends AnyFunSpec with Matchers with DbTypesSupport {
+class DbTypesSupportTest extends AnyFunSpec with DbTypesSupport {
 
   describe("Db Types Support Test") {
 
@@ -15,7 +14,7 @@ class DbTypesSupportTest extends AnyFunSpec with Matchers with DbTypesSupport {
         sqlTst => sqlTst)
 
       val fechaHora: LocalDateTime = LocalDateTime.of(1967, 11, 2, 12, 54, 54)
-      sqlTst.toLocalDateTime should be(fechaHora)
+      assertResult(sqlTst.toLocalDateTime)(fechaHora)
 
     }
 
@@ -24,7 +23,7 @@ class DbTypesSupportTest extends AnyFunSpec with Matchers with DbTypesSupport {
       val error = str2sqlTst("8fff02-11-1967 12:54:54aaa") fold (error => error,
         sqlTst => sqlTst)
 
-      error should be("str2sqltst.error")
+      assertResult(error)("str2sqltst.error")
 
     }
 
