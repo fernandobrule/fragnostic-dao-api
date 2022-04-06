@@ -35,31 +35,30 @@ trait DaoLifeCycleSupport extends AnyFunSpec with BeforeAndAfterAll with FilesSu
     }
 
   def getDataSource: Either[String, MysqlDataSource] =
-    CakeConfEnvService.confEnvService
-      .getString(key = MYSQL8_DATASOURCE_PROPERTY_FILE_NAME)
-      .fold(
+    CakeConfEnvService.confEnvService.getString(key = MYSQL8_DATASOURCE_PROPERTY_FILE_NAME) fold (
+      error => {
+        logger.error(s"getDataSource() - ERROR al cargar propertyFileName, $error")
+        Left("dao.lyfecycle.support.get.datasource.on.get.conf")
+      },
+      propertyFileName => loadProperties(propertyFileName) fold (
         error => {
-          logger.error(s"getDataSource() - ERROR al cargar propertyFileName, $error")
-          Left("dao.lyfecycle.support.get.datasource.on.get.conf")
+          logger.error(s"getDataSource() - ERROR al leer archivo de propiedades, $error")
+          Left("dao.lyfecycle.support.get.datasource.on.load.properties")
         },
-        opt =>
-          opt map (propertyFileName =>
-            loadProperties(propertyFileName) fold (error => {
-              logger.error(s"getDataSource() - ERROR al leer archivo de propiedades, $error")
-              Left("dao.lyfecycle.support.get.datasource.on.load.properties")
-            },
-              props =>
-                getValues(props) fold (error => Left(error),
-                  tuple => {
-                    if (logger.isInfoEnabled()) logger.info(s"getDataSource() - $tuple")
-                    val mysqlDataSource: MysqlDataSource = new MysqlDataSource()
-                    mysqlDataSource.setServerName(tuple._1)
-                    mysqlDataSource.setPort(tuple._2)
-                    mysqlDataSource.setDatabaseName(tuple._3)
-                    mysqlDataSource.setUser(tuple._4)
-                    mysqlDataSource.setPassword(tuple._5)
-                    Right(mysqlDataSource)
-                  }))) getOrElse (Left("dao.lyfecycle.support.get.datasource.on.get.conf.property.file.name.does.not.exists")))
+        props =>
+          getValues(props) fold (
+            error => Left(error),
+            tuple => {
+              val mysqlDataSource: MysqlDataSource = new MysqlDataSource()
+              mysqlDataSource.setServerName(tuple._1)
+              mysqlDataSource.setPort(tuple._2)
+              mysqlDataSource.setDatabaseName(tuple._3)
+              mysqlDataSource.setUser(tuple._4)
+              mysqlDataSource.setPassword(tuple._5)
+              Right(mysqlDataSource)
+            }) //
+      ) //
+    )
 
   val dataSource: MysqlDataSource = getDataSource fold (error => throw new IllegalStateException(error),
     dataSource => dataSource)
