@@ -93,7 +93,7 @@ trait FindPageAgnostic extends ConnectionAgnostic with PreparedStatementSupport 
               findPage(connection, numPage, nummaxBadgets, orderBy, rowsPerPg, prmsPage, sqlFindPage, totalRows, newRow, args)
             } else {
               close(resultSet, prepStat)
-              Right(Page(0, "", 0, 0, Nil, 0, 0, 0, Nil, true): Page[P])
+              Right(Page(0, "", 0, 0, Nil, 0, 0, 0, Nil, listIsEmpty=true): Page[P])
             }
           })
       })
@@ -110,7 +110,7 @@ trait FindPageAgnostic extends ConnectionAgnostic with PreparedStatementSupport 
       Nil
     }
 
-  private def getRows[P](prepStat: PreparedStatement, resultSet: ResultSet, newRow: (ResultSet, Seq[String]) => Either[String, P], args: Seq[String]) =
+  private def getRows[P](prepStat: PreparedStatement, resultSet: ResultSet, newRow: (ResultSet, Seq[String]) => Either[String, P], args: Seq[String]): Either[String, List[P]] =
     try {
       val rows = addRow(resultSet, newRow, args)
       close(resultSet, prepStat)
@@ -132,7 +132,6 @@ trait FindPageAgnostic extends ConnectionAgnostic with PreparedStatementSupport 
     nummaxBadgets: Short,
     orderBy: String,
     rowsPerPg: Int,
-    //optPrmsCount: Map[Int, (String, String)],
     optPrmsPage: Map[Int, (String, String)],
     sqlFindPage: String,
     numRows: Int,
@@ -161,7 +160,7 @@ trait FindPageAgnostic extends ConnectionAgnostic with PreparedStatementSupport 
                 val linksLimits = getPageLinks(numPage, numPages, nummaxBadgets)
                 Right(Page(numPage, orderBy, linksLimits._1, linksLimits._2, linksLimits._3, rowsPerPg, numRows, numPages, list, list.isEmpty): Page[P])
               } else {
-                Right(Page(0, "", 0, 0, Nil, 0, 0, 0, Nil, true): Page[P])
+                Right(Page(0, "", 0, 0, Nil, 0, 0, 0, Nil, listIsEmpty=true): Page[P])
               } //
             ) //
         )
