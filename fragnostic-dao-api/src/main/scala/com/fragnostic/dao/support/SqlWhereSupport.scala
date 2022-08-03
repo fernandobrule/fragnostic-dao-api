@@ -4,16 +4,8 @@ import scala.annotation.tailrec
 
 trait SqlWhereSupport {
 
-  private def buildAnd(tail: List[(String, String, String)], have: Boolean): String = {
-    if (tail.isEmpty && !have) {
-      ""
-    } else if (tail.isEmpty && have) {
-      "\n  and "
-    } else if (have) {
-      "\n  and "
-    } else {
-      ""
-    }
+  private def buildAnd(have: Boolean): String = {
+    if (have) "\n  and " else ""
   }
 
   private def buildValueDecorator(field: (String, String, String), whereReq: List[(String, String, String)], whereList: List[(String, String, String)]): String = {
@@ -36,7 +28,7 @@ trait SqlWhereSupport {
         val field = head._1
         val operation = head._2
         val value = buildValueDecorator(head, whereReq, whereList)
-        buildWhereExpression(tail, sql = s"$sql $field $operation $value ${buildAnd(tail, have)}", whereList, have)
+        buildWhereExpression(tail, sql = s"$sql $field $operation $value ${buildAnd(have)}", whereList, have)
       case Nil =>
         sql
     }
