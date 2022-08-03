@@ -11,7 +11,7 @@ import org.slf4j.{ Logger, LoggerFactory }
  */
 trait FilloutPreparedStatementAgnostic extends DbTypesSupport {
 
-  private[this] val logger: Logger = LoggerFactory.getLogger(getClass.getName)
+  private[this] val logger: Logger = LoggerFactory.getLogger("FilloutPreparedStatementAgnostic")
 
   def filloutPsWithStrList =
     (prepStat: PreparedStatement, req: List[String]) =>

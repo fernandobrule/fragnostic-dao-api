@@ -11,7 +11,7 @@ import org.slf4j.{ Logger, LoggerFactory }
  */
 trait FindByAgnostic extends ConnectionAgnostic with CloseResourceAgnostic with PreparedStatementSupport {
 
-  private[this] val logger: Logger = LoggerFactory.getLogger(getClass.getName)
+  private[this] val logger: Logger = LoggerFactory.getLogger("FindByAgnostic")
 
   //
   // Find By

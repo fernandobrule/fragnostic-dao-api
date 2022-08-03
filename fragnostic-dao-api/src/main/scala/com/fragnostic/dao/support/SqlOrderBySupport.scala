@@ -9,7 +9,7 @@ import scala.collection.mutable.ListBuffer
  */
 trait SqlOrderBySupport {
 
-  private[this] val logger: Logger = LoggerFactory.getLogger(getClass.getName)
+  private[this] val logger: Logger = LoggerFactory.getLogger("SqlOrderBySupport")
 
   def normalize(orderByMap: Map[String, String], rawOrderBy: String): String =
     if (orderByMap.contains(rawOrderBy.trim)) {
@@ -20,26 +20,27 @@ trait SqlOrderBySupport {
     }
 
   def applyOrderBy(
-    orderByMap: Map[String, String],
     rawSql: String,
-    rawOrderBy: String,
-    rawDesc: Boolean): String = {
+    orderAvailable: Map[String, String],
+    orderReq: String,
+    orderDesc: Boolean //
+  ): String = {
 
-    val trimmed = normalize(orderByMap, rawOrderBy)
+    val trimmed = normalize(orderAvailable, orderReq)
     if (trimmed == "") rawSql.replace("{{orderBy}}", "")
     else if (trimmed.indexOf(";") < 0) {
-      if (orderByMap.contains(trimmed))
+      if (orderAvailable.contains(trimmed))
         rawSql.replace(
           "{{orderBy}}",
-          s""" order by ${orderByMap(trimmed)} ${desc(rawDesc)}""")
+          s"""order by ${orderAvailable(trimmed)}${desc(orderDesc)}""")
       else
         rawSql.replace("{{orderBy}}", "")
     } else {
       val orderByBuffer = new ListBuffer[String]
       trimmed.split(";") foreach (
         order =>
-          if (orderByMap.contains(order) && !orderByBuffer.contains(
-            orderByMap(order))) orderByBuffer += orderByMap(order))
+          if (orderAvailable.contains(order) && !orderByBuffer.contains(
+            orderAvailable(order))) orderByBuffer += orderAvailable(order))
 
       if (orderByBuffer.nonEmpty)
         rawSql.replace(
@@ -47,13 +48,19 @@ trait SqlOrderBySupport {
           s""" order by ${
             orderByBuffer.mkString(
               ", ")
-          } ${desc(rawDesc)} """)
+          } ${desc(orderDesc)} """)
       else
         rawSql.replace("{{orderBy}}", "")
     }
 
   }
 
-  def desc(rawDesc: Boolean): String = if (rawDesc) " desc " else ""
+  def desc(rawDesc: Boolean): String = {
+    if (rawDesc) {
+      " desc "
+    } else {
+      ""
+    }
+  }
 
 }

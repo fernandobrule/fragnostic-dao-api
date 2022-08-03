@@ -10,7 +10,7 @@ import org.slf4j.{ Logger, LoggerFactory }
  */
 trait CloseResourceAgnostic {
 
-  private[this] val logger: Logger = LoggerFactory.getLogger(getClass.getName)
+  private[this] val logger: Logger = LoggerFactory.getLogger("CloseResourceAgnostic")
 
   def closeWithoutCommit(connection: Connection): Unit =
     try {

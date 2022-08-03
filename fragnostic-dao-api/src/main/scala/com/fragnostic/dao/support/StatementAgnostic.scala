@@ -12,7 +12,7 @@ import scala.collection.mutable.ArrayBuffer
  */
 trait StatementAgnostic extends CloseResourceAgnostic {
 
-  private[this] val logger: Logger = LoggerFactory.getLogger(getClass.getName)
+  private[this] val logger: Logger = LoggerFactory.getLogger("StatementAgnostic")
 
   def executeBatch(statement: Statement): Either[String, Array[Long]] =
     try {

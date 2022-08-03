@@ -11,7 +11,7 @@ import org.slf4j.{ Logger, LoggerFactory }
  */
 trait ConnectionAgnostic {
 
-  private[this] val logger: Logger = LoggerFactory.getLogger(getClass.getName)
+  private[this] val logger: Logger = LoggerFactory.getLogger("ConnectionAgnostic")
 
   val dataSource: DataSource
 

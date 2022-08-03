@@ -8,7 +8,7 @@ import org.slf4j.{ Logger, LoggerFactory }
 
 trait DbTypesSupport {
 
-  private[this] val logger: Logger = LoggerFactory.getLogger(getClass.getName)
+  private[this] val logger: Logger = LoggerFactory.getLogger("DbTypesSupport")
 
   val ptrnStrTst = "dd-MM-yyyy HH:mm:ss"
   val ptrnSqlTst = "dd-MM-yyyy HH:mm:ss"

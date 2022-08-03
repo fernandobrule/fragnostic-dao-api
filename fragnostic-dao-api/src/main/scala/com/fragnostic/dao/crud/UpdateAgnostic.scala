@@ -13,7 +13,7 @@ import scala.util.Try
  */
 trait UpdateAgnostic extends CloseResourceAgnostic with ConnectionAgnostic with StatementAgnostic {
 
-  private[this] val logger: Logger = LoggerFactory.getLogger(getClass.getName)
+  private[this] val logger: Logger = LoggerFactory.getLogger("UpdateAgnostic")
 
   //
   // Update

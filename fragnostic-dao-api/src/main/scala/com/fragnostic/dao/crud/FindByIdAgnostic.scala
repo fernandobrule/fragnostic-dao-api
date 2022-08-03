@@ -11,7 +11,7 @@ import org.slf4j.{ Logger, LoggerFactory }
  */
 trait FindByIdAgnostic extends ConnectionAgnostic with PreparedStatementSupport {
 
-  private[this] val logger: Logger = LoggerFactory.getLogger(getClass.getName)
+  private[this] val logger: Logger = LoggerFactory.getLogger("FindByIdAgnostic")
 
   //
   // Find By Id

@@ -9,7 +9,7 @@ import org.slf4j.{ Logger, LoggerFactory }
  */
 trait PreparedStatementParamsSupport extends StatementTypeHandler {
 
-  private[this] val logger: Logger = LoggerFactory.getLogger(getClass.getName)
+  private[this] val logger: Logger = LoggerFactory.getLogger("PreparedStatementParamsSupport")
 
   private val OK = "OK"
 

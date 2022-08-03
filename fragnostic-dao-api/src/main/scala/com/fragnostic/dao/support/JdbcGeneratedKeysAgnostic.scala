@@ -10,7 +10,7 @@ import org.slf4j.{ Logger, LoggerFactory }
  */
 trait JdbcGeneratedKeysAgnostic extends CloseResourceAgnostic {
 
-  private[this] val logger: Logger = LoggerFactory.getLogger(getClass.getName)
+  private[this] val logger: Logger = LoggerFactory.getLogger("JdbcGeneratedKeysAgnostic")
 
   def getLongGenKey(prepStat: PreparedStatement, args: Seq[String]): Option[Long] =
     getGenKey[Long](

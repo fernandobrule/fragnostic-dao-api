@@ -9,7 +9,7 @@ import org.slf4j.{ Logger, LoggerFactory }
  */
 trait PreparedStatementSupport extends PreparedStatementParamsSupport with CloseResourceAgnostic {
 
-  private[this] val logger: Logger = LoggerFactory.getLogger(getClass.getName)
+  private[this] val logger: Logger = LoggerFactory.getLogger("PreparedStatementSupport")
 
   def prepareStatement(
     connection: Connection,
@@ -18,11 +18,11 @@ trait PreparedStatementSupport extends PreparedStatementParamsSupport with Close
       Right(connection.prepareStatement(sql))
     } catch {
       case e: SQLException => {
-        logger.error(s"$e")
+        logger.error(s"prepareStatement() - $e\n$sql")
         Left("prepared.statement.support.error.on.prepare.statement.1")
       }
       case e: Throwable => {
-        logger.error(s"$e")
+        logger.error(s"prepareStatement() - $e\n$sql")
         Left("prepared.statement.support.error.on.prepare.statement.2")
       }
     }
@@ -32,15 +32,15 @@ trait PreparedStatementSupport extends PreparedStatementParamsSupport with Close
       Right(prepStat.executeQuery())
     } catch {
       case e: SQLException => {
-        logger.error(s"$e")
+        logger.error(s"executeQuery() -1 $e")
         Left("prepared.statement.support.error.on.execute.query.1")
       }
       case e: Exception => {
-        logger.error(s"$e")
+        logger.error(s"executeQuery() -2 $e")
         Left("prepared.statement.support.error.on.execute.query.2")
       }
       case e: Throwable => {
-        logger.error(s"$e")
+        logger.error(s"executeQuery() -3 $e")
         Left("prepared.statement.support.error.on.execute.query.3")
       }
     }
@@ -51,14 +51,14 @@ trait PreparedStatementSupport extends PreparedStatementParamsSupport with Close
       Right(preparedStatement.executeUpdate())
     } catch {
       case e: SQLException =>
-        logger.error(s"$e")
-        Left("statement.agnostic.error.execute.update")
+        logger.error(s"executeUpdate() - $e")
+        Left("statement.agnostic.error.execute.update.1")
       case e: Exception =>
-        logger.error(s"$e")
-        Left("statement.agnostic.error.execute.update")
+        logger.error(s"executeUpdate() - $e")
+        Left("statement.agnostic.error.execute.update.2")
       case e: Throwable =>
-        logger.error(s"$e")
-        Left("statement.agnostic.error.execute.update")
+        logger.error(s"executeUpdate() - $e")
+        Left("statement.agnostic.error.execute.update.3")
     }
 
   def executeQuery(
@@ -66,54 +66,47 @@ trait PreparedStatementSupport extends PreparedStatementParamsSupport with Close
     sql: String,
     optParams: Map[Int, (String, String)]): Either[List[String], ResultSet] =
     try {
-
       val prepStat: PreparedStatement = connection.prepareStatement(sql)
-
       setParams(optParams, prepStat) fold (
         errors => {
           close(prepStat)
-          logger.error(s"executeQuery|$errors")
+          logger.error(s"executeQuery() - $errors\n$sql")
           Left(errors)
         },
         c => {
           val resultSet = prepStat.executeQuery()
-          //close(prepStat)
           Right(resultSet)
         })
 
     } catch {
       case e: SQLException =>
-        logger.error(s"executeQuery|$e\n$sql")
-        Left(List("statement.agnostic.error.execute.query"))
+        logger.error(s"executeQuery() - $e\n$sql")
+        Left(List("statement.agnostic.error.execute.query.1"))
       case e: Exception =>
-        logger.error(s"executeQuery|$e\n$sql")
-        Left(List("statement.agnostic.error.execute.query"))
+        logger.error(s"executeQuery() - $e\n$sql")
+        Left(List("statement.agnostic.error.execute.query.2"))
       case e: Throwable =>
-        logger.error(s"executeQuery|$e\n$sql")
-        Left(List("statement.agnostic.error.execute.query"))
+        logger.error(s"executeQuery() - $e\n$sql")
+        Left(List("statement.agnostic.error.execute.query.3"))
     }
 
   def executeQuery(
     connection: Connection,
     sql: String): Either[List[String], ResultSet] =
     try {
-
       val prepStat: PreparedStatement = connection.prepareStatement(sql)
-
       val resultSet = prepStat.executeQuery()
-      //close(prepStat)
       Right(resultSet)
-
     } catch {
       case e: SQLException =>
-        logger.error(s"executeQuery|$e\n$sql")
-        Left(List("statement.agnostic.error.execute.query"))
+        logger.error(s"executeQuery() - $e\n$sql")
+        Left(List("statement.agnostic.error.execute.query.1"))
       case e: Exception =>
-        logger.error(s"executeQuery|$e\n$sql")
-        Left(List("statement.agnostic.error.execute.query"))
+        logger.error(s"executeQuery() - $e\n$sql")
+        Left(List("statement.agnostic.error.execute.query.2"))
       case e: Throwable =>
-        logger.error(s"executeQuery|$e\n$sql")
-        Left(List("statement.agnostic.error.execute.query"))
+        logger.error(s"executeQuery() - $e\n$sql")
+        Left(List("statement.agnostic.error.execute.query.3"))
     }
 
 }

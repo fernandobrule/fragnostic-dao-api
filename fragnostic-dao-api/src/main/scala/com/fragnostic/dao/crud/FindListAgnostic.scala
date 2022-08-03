@@ -10,7 +10,7 @@ import org.slf4j.{ Logger, LoggerFactory }
  */
 trait FindListAgnostic extends ConnectionAgnostic with PreparedStatementSupport with RecursionSupport {
 
-  private[this] val logger: Logger = LoggerFactory.getLogger(getClass.getName)
+  private[this] val logger: Logger = LoggerFactory.getLogger("FindListAgnostic")
 
   //
   // Find List By Id

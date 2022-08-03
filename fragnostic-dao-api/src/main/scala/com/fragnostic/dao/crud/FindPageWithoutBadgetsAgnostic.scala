@@ -8,7 +8,7 @@ import org.slf4j.{ Logger, LoggerFactory }
 
 trait FindPageWithoutBadgetsAgnostic extends ConnectionAgnostic with PreparedStatementSupport with PageSupport with PreparedStatementParamsSupport {
 
-  private[this] val logger: Logger = LoggerFactory.getLogger(getClass.getName)
+  private[this] val logger: Logger = LoggerFactory.getLogger("FindPageWithoutBadgetsAgnostic")
 
   def findPage[P](
     numPage: Int,

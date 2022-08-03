@@ -11,7 +11,7 @@ import org.slf4j.{ Logger, LoggerFactory }
  */
 trait ExistsByAgnostic extends ConnectionAgnostic with PreparedStatementSupport {
 
-  private[this] val logger: Logger = LoggerFactory.getLogger(getClass.getName)
+  private[this] val logger: Logger = LoggerFactory.getLogger("ExistsByAgnostic")
 
   //
   // EXISTS BY

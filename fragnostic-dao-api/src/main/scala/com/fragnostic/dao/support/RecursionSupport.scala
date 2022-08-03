@@ -9,7 +9,7 @@ import org.slf4j.{ Logger, LoggerFactory }
  */
 trait RecursionSupport {
 
-  private[this] val logger: Logger = LoggerFactory.getLogger(getClass.getName)
+  private[this] val logger: Logger = LoggerFactory.getLogger("RecursionSupport")
 
   def newList[T](
     resultSet: ResultSet,

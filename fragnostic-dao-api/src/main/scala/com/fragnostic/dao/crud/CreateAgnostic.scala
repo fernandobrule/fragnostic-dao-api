@@ -11,7 +11,7 @@ import org.slf4j.{ Logger, LoggerFactory }
  */
 trait CreateAgnostic extends ConnectionAgnostic with PreparedStatementSupport with JdbcGeneratedKeysAgnostic {
 
-  private[this] val logger: Logger = LoggerFactory.getLogger(getClass.getName)
+  private[this] val logger: Logger = LoggerFactory.getLogger("CreateAgnostic")
 
   //
   // Create
