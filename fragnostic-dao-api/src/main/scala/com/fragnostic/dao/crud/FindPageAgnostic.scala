@@ -79,7 +79,9 @@ trait FindPageAgnostic extends ConnectionAgnostic with PreparedStatementSupport 
       Left("find.page.agnostic.error.rows.per.page.not.valid")
     } else {
       val sqlPageWithOrderBy: String = applyOrderBy(sqlFindPage, orderAvailable, orderReq, orderDesc)
+      //logger.info(s"validate() - sqlPageWithOrderBy:\n$sqlPageWithOrderBy\n=======================")
       val sqlPageWithWhere: String = applyWhereBy(sqlPageWithOrderBy, whereReq, whereAvailable)
+      //logger.info(s"validate() - sqlPageWithWhere:\n$sqlPageWithWhere\n=======================")
       findPageCountTotalRows(connection, numPage, nummaxBadgets, orderReq, rowsPerPg, prmsCount, prmsPage, sqlCountTotalRows, sqlPageWithWhere, newRow, args)
     }
   }
