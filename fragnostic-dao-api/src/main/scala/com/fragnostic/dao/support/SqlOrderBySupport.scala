@@ -12,10 +12,13 @@ trait SqlOrderBySupport {
   private[this] val logger: Logger = LoggerFactory.getLogger("SqlOrderBySupport")
 
   def normalize(orderByMap: Map[String, String], rawOrderBy: String): String =
-    if (orderByMap.contains(rawOrderBy.trim)) {
+    if (rawOrderBy.trim.isEmpty) {
+      logger.warn(s"normalize() - the key to look in orderByMap is empty")
+      ""
+    } else if (orderByMap.contains(rawOrderBy.trim)) {
       rawOrderBy.trim
     } else {
-      logger.warn(s"""normalize() - "order by map" does not contains key ${rawOrderBy.trim}""")
+      logger.warn(s"normalize() - orderByMap does not contains key [${rawOrderBy.trim}]")
       ""
     }
 

@@ -17,8 +17,8 @@ trait SuggestAgnostic extends ConnectionAgnostic with CloseResourceAgnostic with
     query: String,
     sqlSuggest: String,
     limit: Int,
-    newSuggest: (ResultSet, Seq[String]) => Either[String, S],
-    args: Seq[String] = Nil): Either[String, List[S]] =
+    newSuggest: (ResultSet, Map[String, String]) => Either[String, S],
+    args: Map[String, String] = Map.empty): Either[String, List[S]] =
     getConnection map (connection =>
       try {
         // TODO this try

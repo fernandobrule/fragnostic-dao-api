@@ -20,8 +20,8 @@ trait FindByAgnostic extends ConnectionAgnostic with CloseResourceAgnostic with 
     parameter: P,
     sqlFindBy: String,
     filloutPsFindBy: (PreparedStatement, P) => Either[String, PreparedStatement],
-    newEntity: (ResultSet, Seq[String]) => Either[String, T],
-    args: Seq[String] = Nil): Either[String, Option[T]] =
+    newEntity: (ResultSet, Map[String, String]) => Either[String, T],
+    args: Map[String, String] = Map.empty): Either[String, Option[T]] =
     getConnection map (connection =>
       findBy(
         connection,
@@ -47,8 +47,8 @@ trait FindByAgnostic extends ConnectionAgnostic with CloseResourceAgnostic with 
     parameter: P,
     sqlFindBy: String,
     filloutPsFindBy: (PreparedStatement, P) => Either[String, PreparedStatement],
-    newEntity: (ResultSet, Seq[String]) => Either[String, T],
-    args: Seq[String]): Either[String, Option[T]] =
+    newEntity: (ResultSet, Map[String, String]) => Either[String, T],
+    args: Map[String, String]): Either[String, Option[T]] =
     prepareStatement(connection, sqlFindBy) fold (
       error => {
         logger.error(s"findBy | error on prepareStatement - $error")

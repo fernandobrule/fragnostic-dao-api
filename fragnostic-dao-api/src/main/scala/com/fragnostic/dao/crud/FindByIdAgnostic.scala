@@ -20,8 +20,8 @@ trait FindByIdAgnostic extends ConnectionAgnostic with PreparedStatementSupport 
     entityId: I,
     sqlFindById: String,
     filloutPsFindById: (PreparedStatement, I) => Either[String, PreparedStatement],
-    newEntity: (ResultSet, Seq[String]) => Either[String, T],
-    args: Seq[String] = Nil): Either[String, Option[T]] =
+    newEntity: (ResultSet, Map[String, String]) => Either[String, T],
+    args: Map[String, String] = Map.empty): Either[String, Option[T]] =
     getConnection map (connection =>
       findById(
         connection,
@@ -47,8 +47,8 @@ trait FindByIdAgnostic extends ConnectionAgnostic with PreparedStatementSupport 
     entityId: I,
     sqlFindById: String,
     filloutPsFindById: (PreparedStatement, I) => Either[String, PreparedStatement],
-    newEntity: (ResultSet, Seq[String]) => Either[String, T],
-    args: Seq[String]): Either[String, Option[T]] = {
+    newEntity: (ResultSet, Map[String, String]) => Either[String, T],
+    args: Map[String, String]): Either[String, Option[T]] = {
 
     val prepStat = connection.prepareStatement(sqlFindById)
     filloutPsFindById(prepStat, entityId) fold (

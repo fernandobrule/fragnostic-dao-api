@@ -1,8 +1,8 @@
 package com.fragnostic.dao.support
 
-import java.sql.ResultSet
-
 import org.slf4j.{ Logger, LoggerFactory }
+
+import java.sql.ResultSet
 
 /**
  * Created by fernandobrule on 9/17/16.
@@ -11,10 +11,8 @@ trait RecursionSupport {
 
   private[this] val logger: Logger = LoggerFactory.getLogger("RecursionSupport")
 
-  def newList[T](
-    resultSet: ResultSet,
-    newEntity: (ResultSet, Seq[String]) => Either[String, T],
-    args: Seq[String]): Either[String, List[T]] =
+  // TODO java.lang.StackOverflowError
+  def newList[T](resultSet: ResultSet, newEntity: (ResultSet, Map[String, String]) => Either[String, T], args: Map[String, String]): Either[String, List[T]] = {
     if (resultSet.next()) {
       newEntity(resultSet, args) fold (
         error => {
@@ -23,9 +21,12 @@ trait RecursionSupport {
         },
         entity => newList(resultSet, newEntity, args) fold (
           error => Left(error),
-          list => Right(entity :: list)))
+          list => Right(entity :: list) //
+        ) //
+      )
     } else {
       Right(Nil)
     }
+  }
 
 }

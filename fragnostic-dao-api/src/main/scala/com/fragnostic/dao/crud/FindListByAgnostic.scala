@@ -19,8 +19,8 @@ trait FindListByAgnostic extends ConnectionAgnostic with PreparedStatementSuppor
     parameter: P,
     sqlFindListBy: String,
     filloutPsFindListBy: (PreparedStatement, P) => Either[String, PreparedStatement],
-    newEntity: (ResultSet, Seq[String]) => Either[String, T],
-    args: Seq[String] = Nil): Either[String, List[T]] =
+    newEntity: (ResultSet, Map[String, String]) => Either[String, T],
+    args: Map[String, String] = Map.empty): Either[String, List[T]] =
     getConnection map (
       connection =>
         findListBy(
@@ -47,8 +47,8 @@ trait FindListByAgnostic extends ConnectionAgnostic with PreparedStatementSuppor
     parameter: P,
     sqlFindListBy: String,
     filloutPsFindListBy: (PreparedStatement, P) => Either[String, PreparedStatement],
-    newEntity: (ResultSet, Seq[String]) => Either[String, T],
-    args: Seq[String]): Either[String, List[T]] =
+    newEntity: (ResultSet, Map[String, String]) => Either[String, T],
+    args: Map[String, String]): Either[String, List[T]] =
     prepareStatement(connection, sqlFindListBy) fold (
       error => {
         logger.error(

@@ -8,13 +8,20 @@ trait SqlWhereSupport {
     if (have) "\n  and " else ""
   }
 
-  private def buildValueDecorator(field: (String, String, String), whereReq: List[(String, String, String)], whereList: List[(String, String, String)]): String = {
-    val whereTypeTuple: List[(String, String, String)] = whereList.filter(tuple => tuple._1 == field._1 && tuple._2 == field._2)
+  private def buildValueDecorator(field: (String, String, String, String), whereList: List[(String, String, String, String)]): String = {
+    val whereTypeTuple: List[(String, String, String, String)] = whereList.filter(tuple => tuple._1 == field._1 && tuple._2 == field._2)
     if (whereTypeTuple.isEmpty) {
       s""" "${field._3}" """
     } else {
-      if (whereTypeTuple.head._3 == "varchar") {
-        s""" "${field._3}" """
+      if (whereTypeTuple.head._3 == "varchar" || whereTypeTuple.head._3 == "date") {
+        val right = {
+          if (field._4.nonEmpty) {
+            s""" and "${field._4}""""
+          } else {
+            ""
+          }
+        }
+        s""""${field._3}"${right}"""
       } else {
         s"${field._3}"
       }
@@ -22,20 +29,20 @@ trait SqlWhereSupport {
   }
 
   @tailrec
-  private def buildWhereExpression(whereReq: List[(String, String, String)], sql: String, whereList: List[(String, String, String)], have: Boolean): String = {
+  private def buildWhereExpression(whereReq: List[(String, String, String, String)], sql: String, whereList: List[(String, String, String, String)], have: Boolean): String = {
     whereReq match {
       case head :: tail =>
         val field = head._1
         val operation = head._2
-        val value = buildValueDecorator(head, whereReq, whereList)
-        buildWhereExpression(tail, sql = s"$sql $field $operation $value ${buildAnd(have)}", whereList, have)
+        val value = buildValueDecorator(head, whereList)
+        buildWhereExpression(tail, sql = s"$sql $field $operation $value${buildAnd(have)}", whereList, have)
       case Nil =>
         sql
     }
   }
 
   @tailrec
-  private def whereByPredicate(field: String, whereBy: List[(String, String, String)]): Boolean = {
+  private def whereByPredicate(field: String, whereBy: List[(String, String, String, String)]): Boolean = {
     whereBy match {
       case head :: tail =>
         if (head._1 == field) {
@@ -57,14 +64,19 @@ trait SqlWhereSupport {
     }
   }
 
-  def applyWhereBy(rawSql: String, whereReq: List[(String, String, String)], whereAvailable: List[(String, String, String)]): String = {
-    val where: List[(String, String, String)] = whereAvailable.filter(tuple => whereByPredicate(tuple._1, whereReq))
+  def applyWhereBy(rawSql: String, whereReq: List[(String, String, String, String)], whereAvailable: List[(String, String, String, String)]): String = {
+    val where: List[(String, String, String, String)] = whereAvailable.filter(tuple => whereByPredicate(tuple._1, whereReq))
     if (whereReq.isEmpty) {
       rawSql.replace("{{where}}", "")
     } else {
       val have: Boolean = haveWhere(rawSql)
       rawSql.replace("{{where}}", buildWhereExpression(whereReq, if (have) "" else "where", where, have))
     }
+  }
+
+  def translate(whereReq: List[(String, String, String, String)], whereReqMap: Map[String, String]): List[(String, String, String, String)] = {
+    val a = whereReq.filter(tuple => whereReqMap.contains(tuple._1))
+    a.map(tuple => tuple.copy(_1 = whereReqMap(tuple._1)))
   }
 
 }

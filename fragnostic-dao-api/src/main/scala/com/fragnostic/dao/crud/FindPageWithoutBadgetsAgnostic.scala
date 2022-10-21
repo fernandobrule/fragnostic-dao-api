@@ -18,8 +18,8 @@ trait FindPageWithoutBadgetsAgnostic extends ConnectionAgnostic with PreparedSta
     optPrmsPage: Map[Int, (String, String)],
     sqlCountTotalRows: String,
     sqlFindPage: String,
-    newRow: (ResultSet, Seq[String]) => Either[String, P],
-    args: Seq[String] = Nil): Either[String, PageWithoutLinks[P]] =
+    newRow: (ResultSet, Map[String, String]) => Either[String, P],
+    args: Map[String, String] = Map.empty): Either[String, PageWithoutLinks[P]] =
     getConnection map (connection => {
       val eith =
         validate(connection, numPage, orderBy, rowsPerPg, optPrmsCount, optPrmsPage, sqlCountTotalRows, sqlFindPage, newRow, args)
@@ -37,8 +37,8 @@ trait FindPageWithoutBadgetsAgnostic extends ConnectionAgnostic with PreparedSta
     prmsPage: Map[Int, (String, String)],
     sqlCountTotalRows: String,
     sqlFindPage: String,
-    newRow: (ResultSet, Seq[String]) => Either[String, P],
-    args: Seq[String]): Either[String, PageWithoutLinks[P]] =
+    newRow: (ResultSet, Map[String, String]) => Either[String, P],
+    args: Map[String, String]): Either[String, PageWithoutLinks[P]] =
     validate(connection, numPage, orderBy, rowsPerPg, prmsCount, prmsPage, sqlCountTotalRows, sqlFindPage, newRow, args)
 
   private def validate[P](
@@ -50,8 +50,8 @@ trait FindPageWithoutBadgetsAgnostic extends ConnectionAgnostic with PreparedSta
     prmsPage: Map[Int, (String, String)],
     sqlCountTotalRows: String,
     sqlFindPage: String,
-    newRow: (ResultSet, Seq[String]) => Either[String, P],
-    args: Seq[String]): Either[String, PageWithoutLinks[P]] = {
+    newRow: (ResultSet, Map[String, String]) => Either[String, P],
+    args: Map[String, String]): Either[String, PageWithoutLinks[P]] = {
 
     if (numPage < 1) Left("find.page.agnostic.error.num.page.not.valid")
     else if (rowsPerPg < 1) Left("find.page.agnostic.error.rows.per.page.not.valid")
@@ -67,8 +67,8 @@ trait FindPageWithoutBadgetsAgnostic extends ConnectionAgnostic with PreparedSta
     prmsPage: Map[Int, (String, String)],
     sqlCountTotalRows: String,
     sqlFindPage: String,
-    newRow: (ResultSet, Seq[String]) => Either[String, P],
-    args: Seq[String]): Either[String, PageWithoutLinks[P]] = {
+    newRow: (ResultSet, Map[String, String]) => Either[String, P],
+    args: Map[String, String]): Either[String, PageWithoutLinks[P]] = {
 
     val prepStat = connection.prepareStatement(sqlCountTotalRows)
     setParams(prmsCount, prepStat) fold (errors => Left(errors.mkString(",")),
@@ -91,7 +91,7 @@ trait FindPageWithoutBadgetsAgnostic extends ConnectionAgnostic with PreparedSta
       })
   }
 
-  private def addRow[P](resultSet: ResultSet, newRow: (ResultSet, Seq[String]) => Either[String, P], args: Seq[String]): List[P] =
+  private def addRow[P](resultSet: ResultSet, newRow: (ResultSet, Map[String, String]) => Either[String, P], args: Map[String, String]): List[P] =
     if (resultSet.next())
       newRow(resultSet, args) fold (error => {
         logger.error(s"addRow() - $error")
@@ -102,7 +102,7 @@ trait FindPageWithoutBadgetsAgnostic extends ConnectionAgnostic with PreparedSta
       Nil
     }
 
-  private def getRows[P](prepStat: PreparedStatement, resultSet: ResultSet, newRow: (ResultSet, Seq[String]) => Either[String, P], args: Seq[String]) =
+  private def getRows[P](prepStat: PreparedStatement, resultSet: ResultSet, newRow: (ResultSet, Map[String, String]) => Either[String, P], args: Map[String, String]) =
     try {
       val rows = addRow(resultSet, newRow, args)
       close(resultSet, prepStat)
@@ -126,8 +126,8 @@ trait FindPageWithoutBadgetsAgnostic extends ConnectionAgnostic with PreparedSta
     optPrmsPage: Map[Int, (String, String)],
     sqlFindPage: String,
     numRows: Int,
-    newRow: (ResultSet, Seq[String]) => Either[String, P],
-    args: Seq[String]): Either[String, PageWithoutLinks[P]] = {
+    newRow: (ResultSet, Map[String, String]) => Either[String, P],
+    args: Map[String, String]): Either[String, PageWithoutLinks[P]] = {
 
     val numPages: Int = getNumPages(numRows, rowsPerPg)
     val numPage = getNumPage(numPageAparente, numPages)
