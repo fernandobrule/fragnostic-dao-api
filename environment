@@ -1,0 +1,11 @@
+
+export IP_DB=localhost
+
+export REDIS_HOST=localhost
+export REDIS_PORT=6379
+
+export DATASOURCE_HOST=localhost
+export DATASOURCE_PORT=3306
+export DATASOURCE_DB=dbmysqlimpltest
+export DATASOURCE_USR=mysqltestusr
+export DATASOURCE_PSW=mysqltestpsw

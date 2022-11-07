@@ -6,18 +6,29 @@ class SqlWhereSupportTest extends AnyFunSpec with SqlWhereSupport {
 
   describe("*** SqlWhereSupportTest ***") {
 
-    it("Can Build Where Between") {
+    it("Can Build Where") {
 
-      val rawSql: String = "{{where}}"
+      val rawSql: String =
+        """
+          |where
+          |  installment_debt_id = debt_id
+          |  and installment_installment_status_type_id = installment_status_type_id
+          |  and debt_currency_type_code = currency_type_code
+          |  and debt_concept_id = concept_id
+          |  {{where}}
+          |
+          |  """".stripMargin
 
-      val whereReqMap: Map[String, String] = Map(
+      val mapNickToRealColumns: Map[String, String] = Map(
         "date" -> "installment_date",
         "concept" -> "concept_id",
         "installmentStatus" -> "installment_status_type_id" //
       )
 
-      val whereReq: List[(String, String, String, String)] = List( //
-        ("date", "between", "2022-05-01", "2022-05-30") //
+      val mapNickToArgs: List[(String, String, String, String)] = List( //
+        ("concept", "=", "123", ""),
+        ("idonotexist", "=", "1", ""),
+        ("installmentStatus", "=", "PAID", "") //
       )
 
       val whereAvailable: List[(String, String, String, String)] = List(
@@ -26,10 +37,22 @@ class SqlWhereSupportTest extends AnyFunSpec with SqlWhereSupport {
         ("installment_date", "between", "date", "") //
       )
 
-      val whereReqTranslated: List[(String, String, String, String)] = translate(whereReq, whereReqMap)
+      //      val mapWithRealColumns: List[(String, String, String, String)] = translate(mapNickToArgs, mapNickToRealColumns)
+      val mapWithRealColumns: List[(String, String, String, String)] = translate(mapNickToArgs, mapNickToRealColumns)
 
-      val expected: String = """where installment_date between "2022-05-01" and "2022-05-30""""
-      val where: String = applyWhereBy(rawSql, whereReqTranslated, whereAvailable)
+      val expected: String =
+        """
+          |where
+          |  installment_debt_id = debt_id
+          |  and installment_installment_status_type_id = installment_status_type_id
+          |  and debt_currency_type_code = currency_type_code
+          |  and debt_concept_id = concept_id
+          |  and concept_id = 123
+          |  and installment_status_type_id = "PAID"
+          |
+          |  """".stripMargin
+
+      val where: String = applyWhereBy(rawSql, mapWithRealColumns, whereAvailable)
 
       assertResult(expected)(where)
 

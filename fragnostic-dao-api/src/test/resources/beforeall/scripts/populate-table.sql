@@ -1,22 +1,58 @@
 
-insert into 
-  dbmysqlimpltest.test_table(
-    test_short, 
-    test_int, 
-    test_long, 
-    test_double,
-    test_float,
-    test_big_decimal, 
-    test_string, 
-    test_timestamp, 
-    test_date)
-  values(
-    1, -- short
-    2, -- int
-    3, -- long
-    4, -- double
-    5, -- float
-    6, -- big_decimal
-    "7", -- string
-    "", -- timestamp
-    ""); -- date
+insert into ${db.name}.dummy1(dummy1_field1, dummy1_field2) values(1, "one");
+insert into ${db.name}.dummy1(dummy1_field1, dummy1_field2) values(2, "two");
+insert into ${db.name}.dummy1(dummy1_field1, dummy1_field2) values(3, "three");
+insert into ${db.name}.dummy1(dummy1_field1, dummy1_field2) values(4, "four");
+insert into ${db.name}.dummy1(dummy1_field1, dummy1_field2) values(5, "five");
+insert into ${db.name}.dummy1(dummy1_field1, dummy1_field2) values(6, "six");
+insert into ${db.name}.dummy1(dummy1_field1, dummy1_field2) values(7, "seven");
+insert into ${db.name}.dummy1(dummy1_field1, dummy1_field2) values(8, "eight");
+insert into ${db.name}.dummy1(dummy1_field1, dummy1_field2) values(9, "nine");
+insert into ${db.name}.dummy1(dummy1_field1, dummy1_field2) values(10, "ten");
+insert into ${db.name}.dummy1(dummy1_field1, dummy1_field2) values(11, "eleven");
+insert into ${db.name}.dummy1(dummy1_field1, dummy1_field2) values(12, "twelve");
+insert into ${db.name}.dummy1(dummy1_field1, dummy1_field2) values(13, "thirteen");
+insert into ${db.name}.dummy1(dummy1_field1, dummy1_field2) values(14, "fourteen");
+insert into ${db.name}.dummy1(dummy1_field1, dummy1_field2) values(15, "fifteen");
+insert into ${db.name}.dummy1(dummy1_field1, dummy1_field2) values(16, "sixteen");
+insert into ${db.name}.dummy1(dummy1_field1, dummy1_field2) values(17, "seventeen");
+insert into ${db.name}.dummy1(dummy1_field1, dummy1_field2) values(18, "eighteen");
+insert into ${db.name}.dummy1(dummy1_field1, dummy1_field2) values(19, "nineteen");
+insert into ${db.name}.dummy1(dummy1_field1, dummy1_field2) values(20, "twenty");
+insert into ${db.name}.dummy1(dummy1_field1, dummy1_field2) values(21, "twenty-one");
+insert into ${db.name}.dummy1(dummy1_field1, dummy1_field2) values(22, "twenty-two");
+insert into ${db.name}.dummy1(dummy1_field1, dummy1_field2) values(23, "twenty-three");
+insert into ${db.name}.dummy1(dummy1_field1, dummy1_field2) values(24, "twenty-four");
+insert into ${db.name}.dummy1(dummy1_field1, dummy1_field2) values(25, "twenty-five");
+insert into ${db.name}.dummy1(dummy1_field1, dummy1_field2) values(26, "twenty-six");
+insert into ${db.name}.dummy1(dummy1_field1, dummy1_field2) values(27, "twenty-seven");
+insert into ${db.name}.dummy1(dummy1_field1, dummy1_field2) values(28, "twenty-eight");
+insert into ${db.name}.dummy1(dummy1_field1, dummy1_field2) values(29, "twenty-nine");
+insert into ${db.name}.dummy1(dummy1_field1, dummy1_field2) values(30, "thirty");
+insert into ${db.name}.dummy1(dummy1_field1, dummy1_field2) values(31, "thirty-one");
+insert into ${db.name}.dummy1(dummy1_field1, dummy1_field2) values(32, "thirty-two");
+insert into ${db.name}.dummy1(dummy1_field1, dummy1_field2) values(33, "thirty-three");
+insert into ${db.name}.dummy1(dummy1_field1, dummy1_field2) values(34, "thirty-four");
+insert into ${db.name}.dummy1(dummy1_field1, dummy1_field2) values(35, "thirty-five");
+insert into ${db.name}.dummy1(dummy1_field1, dummy1_field2) values(36, "thirty-six");
+insert into ${db.name}.dummy1(dummy1_field1, dummy1_field2) values(37, "thirty-seven");
+insert into ${db.name}.dummy1(dummy1_field1, dummy1_field2) values(38, "thirty-eight");
+insert into ${db.name}.dummy1(dummy1_field1, dummy1_field2) values(39, "thirty-nine");
+insert into ${db.name}.dummy1(dummy1_field1, dummy1_field2) values(40, "forty");
+insert into ${db.name}.dummy1(dummy1_field1, dummy1_field2) values(50, "fifty");
+insert into ${db.name}.dummy1(dummy1_field1, dummy1_field2) values(60, "sixty");
+insert into ${db.name}.dummy1(dummy1_field1, dummy1_field2) values(70, "seventy");
+insert into ${db.name}.dummy1(dummy1_field1, dummy1_field2) values(80, "eighty");
+insert into ${db.name}.dummy1(dummy1_field1, dummy1_field2) values(90, "ninety");
+insert into ${db.name}.dummy1(dummy1_field1, dummy1_field2) values(100, "a hundred/one hundred");
+insert into ${db.name}.dummy1(dummy1_field1, dummy1_field2) values(101, "one hundred one");
+insert into ${db.name}.dummy1(dummy1_field1, dummy1_field2) values(102, "one hundred two");
+insert into ${db.name}.dummy1(dummy1_field1, dummy1_field2) values(103, "one hundred three");
+insert into ${db.name}.dummy1(dummy1_field1, dummy1_field2) values(104, "one hundred four");
+insert into ${db.name}.dummy1(dummy1_field1, dummy1_field2) values(105, "one hundred five");
+insert into ${db.name}.dummy1(dummy1_field1, dummy1_field2) values(200, "two hundred");
+insert into ${db.name}.dummy1(dummy1_field1, dummy1_field2) values(289, "two hundred and eighty-nine");
+insert into ${db.name}.dummy1(dummy1_field1, dummy1_field2) values(300, "three hundred");
+insert into ${db.name}.dummy1(dummy1_field1, dummy1_field2) values(400, "four hundred");
+insert into ${db.name}.dummy1(dummy1_field1, dummy1_field2) values(623, "six hundred and twenty-three");
+insert into ${db.name}.dummy1(dummy1_field1, dummy1_field2) values(937, "nine hundred and thirty-seven");

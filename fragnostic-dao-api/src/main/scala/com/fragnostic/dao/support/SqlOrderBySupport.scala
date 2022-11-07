@@ -11,49 +11,54 @@ trait SqlOrderBySupport {
 
   private[this] val logger: Logger = LoggerFactory.getLogger("SqlOrderBySupport")
 
-  def normalize(orderByMap: Map[String, String], rawOrderBy: String): String =
-    if (rawOrderBy.trim.isEmpty) {
+  def normalize(mapNickToArgs: Map[String, String], orderCriterion: String): String =
+    if (orderCriterion.trim.isEmpty) {
       logger.warn(s"normalize() - the key to look in orderByMap is empty")
       ""
-    } else if (orderByMap.contains(rawOrderBy.trim)) {
-      rawOrderBy.trim
+    } else if (mapNickToArgs.contains(orderCriterion.trim)) {
+      orderCriterion.trim
     } else {
-      logger.warn(s"normalize() - orderByMap does not contains key [${rawOrderBy.trim}]")
+      logger.warn(s"normalize() - orderByMap does not contains key [${orderCriterion.trim}]")
       ""
     }
 
-  def applyOrderBy(
-    rawSql: String,
-    orderAvailable: Map[String, String],
-    orderReq: String,
-    orderDesc: Boolean //
+  def applyOrderBy( //sqlFindPage, mapNickToArgs, orderCriterion, orderDescFlag
+    sqlFindPage: String,
+    mapNickToArgs: Map[String, String],
+    orderCriterion: String,
+    orderDescFlag: Boolean //
   ): String = {
 
-    val trimmed = normalize(orderAvailable, orderReq)
-    if (trimmed == "") rawSql.replace("{{orderBy}}", "")
+    val trimmed = normalize(mapNickToArgs, orderCriterion)
+    if (trimmed == "") sqlFindPage.replace("{{orderBy}}", "")
     else if (trimmed.indexOf(";") < 0) {
-      if (orderAvailable.contains(trimmed))
-        rawSql.replace(
+      if (mapNickToArgs.contains(trimmed))
+        sqlFindPage.replace(
           "{{orderBy}}",
-          s"""order by ${orderAvailable(trimmed)}${desc(orderDesc)}""")
+          s"""order by ${mapNickToArgs(trimmed)}${desc(orderDescFlag)}""" //
+        )
       else
-        rawSql.replace("{{orderBy}}", "")
+        sqlFindPage.replace("{{orderBy}}", "")
     } else {
       val orderByBuffer = new ListBuffer[String]
       trimmed.split(";") foreach (
         order =>
-          if (orderAvailable.contains(order) && !orderByBuffer.contains(
-            orderAvailable(order))) orderByBuffer += orderAvailable(order))
+          if (mapNickToArgs.contains(order) && !orderByBuffer.contains(mapNickToArgs(order))) {
+            orderByBuffer += mapNickToArgs(order)
+          } //
+      )
 
-      if (orderByBuffer.nonEmpty)
-        rawSql.replace(
+      if (orderByBuffer.nonEmpty) {
+        sqlFindPage.replace(
           "{{orderBy}}",
           s""" order by ${
             orderByBuffer.mkString(
               ", ")
-          } ${desc(orderDesc)} """)
-      else
-        rawSql.replace("{{orderBy}}", "")
+          } ${desc(orderDescFlag)} """ //
+        )
+      } else {
+        sqlFindPage.replace("{{orderBy}}", "")
+      }
     }
 
   }

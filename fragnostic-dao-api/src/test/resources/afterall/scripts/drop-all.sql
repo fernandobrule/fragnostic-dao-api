@@ -1,6 +1,6 @@
 
-drop user 'mysqltestusr'@'%';
+drop user '${env.ANT_PROPS_DB_USR}'@'%';
 flush privileges;
 
-drop database dbmysqlimpltest;
+drop database ${db.name};
 

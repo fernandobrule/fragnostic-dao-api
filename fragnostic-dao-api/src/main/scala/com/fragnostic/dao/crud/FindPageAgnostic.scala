@@ -16,13 +16,13 @@ trait FindPageAgnostic extends ConnectionAgnostic with PreparedStatementSupport 
 
   def findPage[P](
     numPage: Int,
-    nummaxBadgets: Short,
+    numMaxBadgets: Short,
     rowsPerPg: Int,
-    orderDesc: Boolean,
-    orderReq: String,
+    orderDescFlag: Boolean,
+    orderCriterion: String,
     orderAvailable: Map[String, String],
-    whereReq: List[(String, String, String, String)],
-    whereAvailable: List[(String, String, String, String)],
+    mapNickToArgs: List[(String, String, String, String)],
+    mapNickToRealColumns: List[(String, String, String, String)],
     prmsCount: Map[Int, (String, String)],
     prmsPage: Map[Int, (String, String)],
     sqlCountTotalRows: String,
@@ -30,7 +30,7 @@ trait FindPageAgnostic extends ConnectionAgnostic with PreparedStatementSupport 
     newRow: (ResultSet, Map[String, String]) => Either[String, P],
     args: Map[String, String] = Map.empty): Either[String, Page[P]] = {
     getConnection map (connection => {
-      val eith = validate(connection, numPage, nummaxBadgets, rowsPerPg, orderDesc, orderReq, orderAvailable, whereReq, whereAvailable, prmsCount, prmsPage, sqlCountTotalRows, sqlFindPage, newRow, args)
+      val eith = validate(connection, numPage, numMaxBadgets, rowsPerPg, orderDescFlag, orderCriterion, orderAvailable, mapNickToArgs, mapNickToRealColumns, prmsCount, prmsPage, sqlCountTotalRows, sqlFindPage, newRow, args)
       closeWithoutCommit(connection)
       eith
     }) getOrElse Left("agnostic.dao.find.page.error.db.nc")
@@ -39,31 +39,31 @@ trait FindPageAgnostic extends ConnectionAgnostic with PreparedStatementSupport 
   def findPage[P](
     connection: Connection,
     numPage: Int,
-    nummaxBadgets: Short,
+    numMaxBadgets: Short,
     rowsPerPg: Int,
     orderDesc: Boolean,
     orderReq: String,
     orderAvailable: Map[String, String],
-    whereReq: List[(String, String, String, String)],
-    whereAvailable: List[(String, String, String, String)],
+    mapNickToArgs: List[(String, String, String, String)],
+    mapNickToRealColumns: List[(String, String, String, String)],
     prmsCount: Map[Int, (String, String)],
     prmsPage: Map[Int, (String, String)],
     sqlCountTotalRows: String,
     sqlFindPage: String,
     newRow: (ResultSet, Map[String, String]) => Either[String, P],
     args: Map[String, String]): Either[String, Page[P]] = {
-    validate(connection, numPage, nummaxBadgets, rowsPerPg, orderDesc, orderReq, orderAvailable, whereReq, whereAvailable, prmsCount, prmsPage, sqlCountTotalRows, sqlFindPage, newRow, args)
+    validate(connection, numPage, numMaxBadgets, rowsPerPg, orderDesc, orderReq, orderAvailable, mapNickToArgs, mapNickToRealColumns, prmsCount, prmsPage, sqlCountTotalRows, sqlFindPage, newRow, args)
   }
-
+  //connection, numPage, numMaxBadgets, rowsPerPg, orderDescFlag, orderCriterion, orderAvailable, mapNickToArgs, mapNickToRealColumns, prmsCount, prmsPage, sqlCountTotalRows, sqlFindPage, newRow, args
   private def validate[P](
     connection: Connection,
     numPage: Int,
-    nummaxBadgets: Short,
+    numMaxBadgets: Short,
     rowsPerPg: Int,
-    orderDesc: Boolean,
-    orderReq: String,
-    orderAvailable: Map[String, String],
-    whereReq: List[(String, String, String, String)],
+    orderDescFlag: Boolean,
+    orderCriterion: String,
+    mapNickToArgs: Map[String, String],
+    mapNickToRealColumns: List[(String, String, String, String)],
     whereAvailable: List[(String, String, String, String)],
     prmsCount: Map[Int, (String, String)],
     prmsPage: Map[Int, (String, String)],
@@ -73,35 +73,35 @@ trait FindPageAgnostic extends ConnectionAgnostic with PreparedStatementSupport 
     args: Map[String, String]): Either[String, Page[P]] = {
     if (numPage < 1) {
       Left("find.page.agnostic.error.num.page.not.valid")
-    } else if (nummaxBadgets < 1) {
+    } else if (numMaxBadgets < 1) {
       Left("find.page.agnostic.error.num.max.badgets.not.valid")
     } else if (rowsPerPg < 1) {
       Left("find.page.agnostic.error.rows.per.page.not.valid")
     } else {
 
-      val sqlFindPageAfterApplyOrderBy: String = applyOrderBy(sqlFindPage, orderAvailable, orderReq, orderDesc)
+      val sqlFindPageAfterApplyOrderBy: String = applyOrderBy(sqlFindPage, mapNickToArgs, orderCriterion, orderDescFlag)
       if (logger.isDebugEnabled) {
         logger.debug(s"validate() - sqlFindPageAfterApplyOrderBy:\n$sqlFindPageAfterApplyOrderBy\n=======================")
       }
 
-      val sqlFindPageAfterApplyWhere: String = applyWhereBy(sqlFindPageAfterApplyOrderBy, whereReq, whereAvailable)
+      val sqlFindPageAfterApplyWhere: String = applyWhereBy(sqlFindPageAfterApplyOrderBy, mapNickToRealColumns, whereAvailable)
       if (logger.isDebugEnabled) {
         logger.debug(s"validate() - sqlFindPageAfterApplyWhere:\n$sqlFindPageAfterApplyWhere\n=======================")
       }
 
-      val sqlCountTotalRowsAfterApplyWhere: String = applyWhereBy(sqlCountTotalRows, whereReq, whereAvailable)
+      val sqlCountTotalRowsAfterApplyWhere: String = applyWhereBy(sqlCountTotalRows, mapNickToRealColumns, whereAvailable)
       if (logger.isDebugEnabled) {
         logger.debug(s"validate() - sqlCountTotalRowsAfterApplyWhere:\n$sqlCountTotalRowsAfterApplyWhere\n=======================")
       }
 
-      findPageCountTotalRows(connection, numPage, nummaxBadgets, orderReq, rowsPerPg, prmsCount, prmsPage, sqlCountTotalRowsAfterApplyWhere, sqlFindPageAfterApplyWhere, newRow, args)
+      findPageCountTotalRows(connection, numPage, numMaxBadgets, orderCriterion, rowsPerPg, prmsCount, prmsPage, sqlCountTotalRowsAfterApplyWhere, sqlFindPageAfterApplyWhere, newRow, args)
     }
   }
 
   private def findPageCountTotalRows[P](
     connection: Connection,
     numPage: Int,
-    nummaxBadgets: Short,
+    numMaxBadgets: Short,
     orderBy: String,
     rowsPerPg: Int,
     prmsCount: Map[Int, (String, String)],
@@ -123,7 +123,7 @@ trait FindPageAgnostic extends ConnectionAgnostic with PreparedStatementSupport 
             if (resultSet.next()) {
               val totalRows = resultSet.getInt("total_rows")
               close(resultSet, prepStat)
-              findPage(connection, numPage, nummaxBadgets, orderBy, rowsPerPg, prmsPage, sqlFindPage, totalRows, newRow, args)
+              findPage(connection, numPage, numMaxBadgets, orderBy, rowsPerPg, prmsPage, sqlFindPage, totalRows, newRow, args)
             } else {
               close(resultSet, prepStat)
               Right(Page(0, "", 0, 0, Nil, 0, 0, 0, Nil, listIsEmpty = true): Page[P])
@@ -162,7 +162,7 @@ trait FindPageAgnostic extends ConnectionAgnostic with PreparedStatementSupport 
   private def findPage[P](
     connection: Connection,
     numPageAparente: Int,
-    nummaxBadgets: Short,
+    numMaxBadgets: Short,
     orderBy: String,
     rowsPerPg: Int,
     optPrmsPage: Map[Int, (String, String)],
@@ -190,7 +190,7 @@ trait FindPageAgnostic extends ConnectionAgnostic with PreparedStatementSupport 
           resultSet =>
             getRows(prepStat, resultSet, newRow, args) fold (error => Left(error),
               list => if (list.nonEmpty) {
-                val linksLimits = getPageLinks(numPage, numPages, nummaxBadgets)
+                val linksLimits = getPageLinks(numPage, numPages, numMaxBadgets)
                 Right(Page(numPage, orderBy, linksLimits._1, linksLimits._2, linksLimits._3, rowsPerPg, numRows, numPages, list, list.isEmpty): Page[P])
               } else {
                 Right(Page(0, "", 0, 0, Nil, 0, 0, 0, Nil, listIsEmpty = true): Page[P])

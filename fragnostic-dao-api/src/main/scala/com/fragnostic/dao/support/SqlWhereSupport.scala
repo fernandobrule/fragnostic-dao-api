@@ -4,8 +4,8 @@ import scala.annotation.tailrec
 
 trait SqlWhereSupport {
 
-  private def buildAnd(have: Boolean): String = {
-    if (have) "\n  and " else ""
+  private def buildAnd(have: List[(String, String, String, String)]): String = {
+    if (have.nonEmpty) "\n  and" else ""
   }
 
   private def buildValueDecorator(field: (String, String, String, String), whereList: List[(String, String, String, String)]): String = {
@@ -35,7 +35,7 @@ trait SqlWhereSupport {
         val field = head._1
         val operation = head._2
         val value = buildValueDecorator(head, whereList)
-        buildWhereExpression(tail, sql = s"$sql $field $operation $value${buildAnd(have)}", whereList, have)
+        buildWhereExpression(tail, sql = s"$sql $field $operation $value${buildAnd(tail)}", whereList, have)
       case Nil =>
         sql
     }
@@ -54,7 +54,7 @@ trait SqlWhereSupport {
     }
   }
 
-  private val pattern = "(where)".r
+  private val pattern = """(where)""".r
   private def haveWhere(sql: String): Boolean = {
     val all = pattern.findAllIn(sql)
     if (all.size > 1) {
@@ -64,19 +64,22 @@ trait SqlWhereSupport {
     }
   }
 
-  def applyWhereBy(rawSql: String, whereReq: List[(String, String, String, String)], whereAvailable: List[(String, String, String, String)]): String = {
-    val where: List[(String, String, String, String)] = whereAvailable.filter(tuple => whereByPredicate(tuple._1, whereReq))
-    if (whereReq.isEmpty) {
+  // rawSql, mapWithRealColumns, whereAvailable
+  def applyWhereBy(rawSql: String, mapWithRealColumns: List[(String, String, String, String)], whereAvailable: List[(String, String, String, String)]): String = {
+    val where: List[(String, String, String, String)] = whereAvailable.filter(tuple => whereByPredicate(tuple._1, mapWithRealColumns))
+    if (mapWithRealColumns.isEmpty) {
       rawSql.replace("{{where}}", "")
     } else {
       val have: Boolean = haveWhere(rawSql)
-      rawSql.replace("{{where}}", buildWhereExpression(whereReq, if (have) "" else "where", where, have))
+      rawSql.replace("{{where}}", buildWhereExpression(mapWithRealColumns, if (have) "and" else "where", where, have))
     }
   }
 
-  def translate(whereReq: List[(String, String, String, String)], whereReqMap: Map[String, String]): List[(String, String, String, String)] = {
-    val a = whereReq.filter(tuple => whereReqMap.contains(tuple._1))
-    a.map(tuple => tuple.copy(_1 = whereReqMap(tuple._1)))
+  def translate(mapNickToArgs: List[(String, String, String, String)], mapNickToRealColumns: Map[String, String]): List[(String, String, String, String)] = {
+    val a = mapNickToArgs.filter(tuple => mapNickToRealColumns.contains(tuple._1))
+    a.map(
+      tuple => tuple.copy(_1 = mapNickToRealColumns(tuple._1)) //
+    )
   }
 
 }
