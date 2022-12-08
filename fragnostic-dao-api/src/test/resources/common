@@ -1,0 +1,17 @@
+
+export ANT_PROPS_DB_NAME=$DATASOURCE_DB
+export ANT_PROPS_DB_USR=$DATASOURCE_USR
+export ANT_PROPS_DB_PSW=$DATASOURCE_PSW
+export IP_HOST=$(ifconfig|grep inet|grep netmask|grep broadcast|awk '{print($2)}')
+export IP_DB=localhost
+
+echo ""
+echo ""
+echo "             IP_DB : $IP_DB"
+echo "           IP_HOST : $IP_HOST"
+echo "  ANT_PROPS_DB_USR : $ANT_PROPS_DB_USR"
+echo "    DATASOURCE_PSW : $ANT_PROPS_DB_PSW"
+echo " ANT_PROPS_DB_NAME : $ANT_PROPS_DB_NAME"
+echo "        ACTUAL_DIR : $ACTUAL_DIR"
+echo ""
+echo ""

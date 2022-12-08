@@ -94,7 +94,6 @@ lazy val fragnosticDaoApi = Project(
   base = file("fragnostic-dao-api")).settings(fragnosticSettings ++ Seq(
   libraryDependencies ++= Seq(
     logbackClassic,
-    slf4jApi,
     scalatestFunSpec,
     mysql8JavaClient,
     fragnosticConfEnv,

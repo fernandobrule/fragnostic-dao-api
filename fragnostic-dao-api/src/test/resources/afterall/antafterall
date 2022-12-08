@@ -1,17 +1,7 @@
 #!/bin/bash
 
-export ANT_PROPS_DB_NAME=dummydev
-export ANT_PROPS_DB_USR=dummydevusr
-export ANT_PROPS_DB_PSW=dummydevpsw
-export IP_HOST=$(ifconfig|grep inet|grep netmask|grep broadcast|awk '{print($2)}')
-actualDir=$(pwd)
+ACTUAL_DIR=$(pwd)
 
-echo ""
-export IP_DB=localhost
-echo "             IP_DB : $IP_DB"
-echo "           IP_HOST : $IP_HOST"
-echo " ANT_PROPS_DB_NAME : $ANT_PROPS_DB_NAME"
-echo          "actualDir : $actualDir"
-echo ""
+source $ACTUAL_DIR/fragnostic-dao-api/src/test/resources/common
 
-/opt/ant/ant/bin/ant -f $actualDir/fragnostic-dao-api/src/test/resources/afterall/build-afterall.xml afterall
+/opt/ant/ant/bin/ant -q -f $ACTUAL_DIR/fragnostic-dao-api/src/test/resources/afterall/build-afterall.xml afterall

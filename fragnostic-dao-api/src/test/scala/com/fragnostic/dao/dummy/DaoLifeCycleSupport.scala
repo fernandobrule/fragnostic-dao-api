@@ -1,6 +1,6 @@
-package com.fragnostic.dao.support
+package com.fragnostic.dao.dummy
 
-import com.fragnostic.service.CakeDaoMySql
+import com.fragnostic.dao.support.ConnectionAgnostic
 import com.fragnostic.support.FilesSupport
 import com.mysql.cj.jdbc.MysqlDataSource
 import org.scalatest.BeforeAndAfterAll
@@ -10,7 +10,7 @@ import org.slf4j.{ Logger, LoggerFactory }
 import scala.language.postfixOps
 import scala.sys.process._
 
-trait DaoLifeCycleSupport extends AnyFunSpec with BeforeAndAfterAll with FilesSupport {
+trait DaoLifeCycleSupport extends AnyFunSpec with ConnectionAgnostic with BeforeAndAfterAll with FilesSupport {
 
   private[this] val logger: Logger = LoggerFactory.getLogger("DaoLifeCycleSupport")
 

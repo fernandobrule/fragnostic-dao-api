@@ -1,8 +1,8 @@
-package com.fragnostic.service.impl
+package com.fragnostic.dao.dummy
 
+import com.fragnostic.conf.env.service.CakeConfEnvService
 import com.fragnostic.dao.api.DataSourceApi
 import com.mysql.cj.jdbc.MysqlDataSource
-import com.fragnostic.conf.env.service.CakeConfEnvService.confEnvService.{ getInt, getString }
 
 trait MySql8DataSource extends DataSourceApi {
 
@@ -19,11 +19,11 @@ trait MySql8DataSource extends DataSourceApi {
     //
     private val getConfig: Either[String, (String, Int, String, String, String)] =
       for {
-        host <- getString("DATASOURCE_HOST")
-        port <- getInt("DATASOURCE_PORT")
-        db <- getString("DATASOURCE_DB")
-        usr <- getString("DATASOURCE_USR")
-        psw <- getString("DATASOURCE_PSW")
+        host <- CakeConfEnvService.confEnvService.getString("DATASOURCE_HOST")
+        port <- CakeConfEnvService.confEnvService.getInt("DATASOURCE_PORT")
+        db <- CakeConfEnvService.confEnvService.getString("DATASOURCE_DB")
+        usr <- CakeConfEnvService.confEnvService.getString("DATASOURCE_USR")
+        psw <- CakeConfEnvService.confEnvService.getString("DATASOURCE_PSW")
       } yield {
         (host, port, db, usr, psw)
       }

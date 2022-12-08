@@ -6,6 +6,6 @@ export REDIS_PORT=6379
 
 export DATASOURCE_HOST=localhost
 export DATASOURCE_PORT=3306
-export DATASOURCE_DB=dbmysqlimpltest
-export DATASOURCE_USR=mysqltestusr
-export DATASOURCE_PSW=mysqltestpsw
+export DATASOURCE_DB=dummydev
+export DATASOURCE_USR=dummydevusr
+export DATASOURCE_PSW=dummydevpsw

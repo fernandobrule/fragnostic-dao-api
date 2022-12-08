@@ -75,22 +75,24 @@ trait FindPageAgnostic extends ConnectionAgnostic with PreparedStatementSupport 
       Left("find.page.agnostic.error.num.page.not.valid")
     } else if (numMaxBadgets < 1) {
       Left("find.page.agnostic.error.num.max.badgets.not.valid")
+    } else if (!sqlFindPage.contains("limit")) {
+      Left("find.page.agnostic.error.sql.find.page.does.not.contains.limit.clause")
     } else if (rowsPerPg < 1) {
       Left("find.page.agnostic.error.rows.per.page.not.valid")
     } else {
 
       val sqlFindPageAfterApplyOrderBy: String = applyOrderBy(sqlFindPage, mapNickToArgs, orderCriterion, orderDescFlag)
-      if (logger.isDebugEnabled) {
+      if (logger.isInfoEnabled) {
         logger.debug(s"validate() - sqlFindPageAfterApplyOrderBy:\n$sqlFindPageAfterApplyOrderBy\n=======================")
       }
 
       val sqlFindPageAfterApplyWhere: String = applyWhereBy(sqlFindPageAfterApplyOrderBy, mapNickToRealColumns, whereAvailable)
-      if (logger.isDebugEnabled) {
+      if (logger.isInfoEnabled) {
         logger.debug(s"validate() - sqlFindPageAfterApplyWhere:\n$sqlFindPageAfterApplyWhere\n=======================")
       }
 
       val sqlCountTotalRowsAfterApplyWhere: String = applyWhereBy(sqlCountTotalRows, mapNickToRealColumns, whereAvailable)
-      if (logger.isDebugEnabled) {
+      if (logger.isInfoEnabled) {
         logger.debug(s"validate() - sqlCountTotalRowsAfterApplyWhere:\n$sqlCountTotalRowsAfterApplyWhere\n=======================")
       }
 
@@ -175,30 +177,38 @@ trait FindPageAgnostic extends ConnectionAgnostic with PreparedStatementSupport 
     val numPage = getNumPage(numPageAparente, numPages)
     val idx = (numPage - 1) * rowsPerPg
     val prepStat = connection.prepareStatement(sqlFindPage)
-    setParams(optPrmsPage, prepStat) fold (errors => {
-      close(prepStat)
-      Left(errors.mkString(", "))
-    },
+
+    setParams(optPrmsPage, prepStat) fold ( //
+      errors => {
+        close(prepStat)
+        Left(errors.mkString(", "))
+      },
       col => {
+
         prepStat.setInt(col + 1, idx)
         prepStat.setInt(col + 2, rowsPerPg)
-        executeQuery(prepStat) fold (error => {
-          close(prepStat)
-          logger.error(s"findPage() - query executed with error: $error\n$sqlFindPage\n---------------------\n")
-          Left(error)
-        },
-          resultSet =>
-            getRows(prepStat, resultSet, newRow, args) fold (error => Left(error),
+
+        executeQuery(prepStat) fold (
+          error => {
+            close(prepStat)
+            logger.error(s"findPage() - query executed with error: $error\n$sqlFindPage\n---------------------\n")
+            Left(error)
+          },
+          resultSet => {
+            getRows(prepStat, resultSet, newRow, args) fold ( //
+              error => Left(error),
               list => if (list.nonEmpty) {
                 val linksLimits = getPageLinks(numPage, numPages, numMaxBadgets)
                 Right(Page(numPage, orderBy, linksLimits._1, linksLimits._2, linksLimits._3, rowsPerPg, numRows, numPages, list, list.isEmpty): Page[P])
               } else {
                 Right(Page(0, "", 0, 0, Nil, 0, 0, 0, Nil, listIsEmpty = true): Page[P])
               } //
-            ) //
+            )
+          } //
         )
 
-      })
+      } //
+    )
 
   }
 

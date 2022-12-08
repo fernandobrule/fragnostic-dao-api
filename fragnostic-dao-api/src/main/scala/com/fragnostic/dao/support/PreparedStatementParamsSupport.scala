@@ -16,10 +16,12 @@ trait PreparedStatementParamsSupport extends StatementTypeHandler {
   def setParams(
     prmsCount: Map[Int, (String, String)],
     prepStat: PreparedStatement): Either[List[String], Int] = {
+
     val errors = handleIterator(
       prmsCount.keysIterator,
       prmsCount,
       prepStat).filter(_ != OK)
+
     if (errors.isEmpty) {
       if (prmsCount.nonEmpty) {
         Right(prmsCount.keysIterator.max)
