@@ -1,9 +1,8 @@
 package com.fragnostic.dao.support
 
-import java.sql.{ SQLException, Statement }
-
 import org.slf4j.{ Logger, LoggerFactory }
 
+import java.sql.{ SQLException, Statement }
 import scala.collection.mutable.ArrayBuffer
 
 /**

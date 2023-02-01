@@ -1,8 +1,8 @@
 package com.fragnostic.dao.support
 
-import java.sql.{ PreparedStatement, SQLException }
-
 import org.slf4j.{ Logger, LoggerFactory }
+
+import java.sql.{ PreparedStatement, SQLException }
 
 /**
  * Created by fernandobrule on 12/3/15.

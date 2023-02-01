@@ -1,9 +1,9 @@
 package com.fragnostic.dao.crud
 
-import java.sql.{ ResultSet, SQLException }
-
 import com.fragnostic.dao.support.{ CloseResourceAgnostic, ConnectionAgnostic, RecursionSupport }
 import org.slf4j.{ Logger, LoggerFactory }
+
+import java.sql.{ ResultSet, SQLException }
 
 /**
  * Created by Fernando Brule on 30-06-2015 22:23:00.
@@ -18,7 +18,7 @@ trait SuggestAgnostic extends ConnectionAgnostic with CloseResourceAgnostic with
     sqlSuggest: String,
     limit: Int,
     newSuggest: (ResultSet, Map[String, String]) => Either[String, S],
-    args: Map[String, String] = Map.empty): Either[String, List[S]] =
+    args: Map[String, String] = Map.empty): Either[String, List[S]] = {
     getConnection map (connection =>
       try {
         // TODO this try
@@ -26,19 +26,12 @@ trait SuggestAgnostic extends ConnectionAgnostic with CloseResourceAgnostic with
         prepStat.setString(1, s"$query")
         prepStat.setInt(2, limit)
         val resultSet = prepStat.executeQuery()
-        newList(resultSet, newSuggest, args) fold (
-          error => {
-            logger.error(s"suggestBy() - $error")
-            close(resultSet)
-            close(prepStat)
-            Left(error)
-          },
-          list => {
-            close(resultSet)
-            close(prepStat)
-            closeWithoutCommit(connection)
-            Right(list)
-          })
+
+        close(resultSet)
+        close(prepStat)
+        closeWithoutCommit(connection)
+        Right(newList(resultSet, newSuggest, args))
+
       } catch {
         case e: SQLException =>
           closeWithoutCommit(connection)
@@ -48,6 +41,8 @@ trait SuggestAgnostic extends ConnectionAgnostic with CloseResourceAgnostic with
           closeWithoutCommit(connection)
           logger.error(s"suggestBy|\n\n- $e\n- sqlSuggest: $sqlSuggest\n- query: $query")
           Left("suggest.agnostic.error")
-      }) getOrElse Left(s"suggest|Error: trying to get DB connection")
+      } //
+    ) getOrElse Left(s"suggest|Error: trying to get DB connection")
+  }
 
 }

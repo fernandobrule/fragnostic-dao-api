@@ -1,10 +1,10 @@
 package com.fragnostic.dao.crud
 
 import com.fragnostic.dao.glue.PageWithoutLinks
-
-import java.sql.{ Connection, PreparedStatement, ResultSet, SQLException }
 import com.fragnostic.dao.support.{ ConnectionAgnostic, PageSupport, PreparedStatementParamsSupport, PreparedStatementSupport }
 import org.slf4j.{ Logger, LoggerFactory }
+
+import java.sql.{ Connection, PreparedStatement, ResultSet, SQLException }
 
 trait FindPageWithoutBadgetsAgnostic extends ConnectionAgnostic with PreparedStatementSupport with PageSupport with PreparedStatementParamsSupport {
 

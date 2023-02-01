@@ -1,9 +1,9 @@
 package com.fragnostic.dao.crud
 
-import java.sql.{ Connection, PreparedStatement, ResultSet }
-
 import com.fragnostic.dao.support.{ ConnectionAgnostic, PreparedStatementSupport }
 import org.slf4j.{ Logger, LoggerFactory }
+
+import java.sql.{ Connection, PreparedStatement, ResultSet }
 
 /**
  * Created by Fernando Brule on 30-06-2015 22:23:00.

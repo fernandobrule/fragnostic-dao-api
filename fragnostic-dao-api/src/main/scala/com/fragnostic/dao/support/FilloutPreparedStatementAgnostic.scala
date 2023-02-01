@@ -1,9 +1,9 @@
 package com.fragnostic.dao.support
 
+import org.slf4j.{ Logger, LoggerFactory }
+
 import java.sql.{ PreparedStatement, Timestamp }
 import java.util.Date
-
-import org.slf4j.{ Logger, LoggerFactory }
 
 /**
  * Created by Fernando Brule on 30-06-2015 22:23:00.

@@ -1,10 +1,9 @@
 package com.fragnostic.dao.crud
 
-import java.sql.{ Connection, PreparedStatement }
-
 import com.fragnostic.dao.support.{ ConnectionAgnostic, PreparedStatementSupport }
 import org.slf4j.{ Logger, LoggerFactory }
 
+import java.sql.{ Connection, PreparedStatement }
 import scala.util.Try
 
 /**

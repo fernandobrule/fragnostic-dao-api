@@ -3,6 +3,7 @@ package com.fragnostic.dao.support
 import org.slf4j.{ Logger, LoggerFactory }
 
 import java.sql.ResultSet
+import scala.annotation.tailrec
 
 /**
  * Created by fernandobrule on 9/17/16.
@@ -11,22 +12,24 @@ trait RecursionSupport {
 
   private[this] val logger: Logger = LoggerFactory.getLogger("RecursionSupport")
 
-  // TODO java.lang.StackOverflowError
-  def newList[T](resultSet: ResultSet, newEntity: (ResultSet, Map[String, String]) => Either[String, T], args: Map[String, String]): Either[String, List[T]] = {
-    if (resultSet.next()) {
-      newEntity(resultSet, args) fold (
-        error => {
-          logger.error(s"newList() - $error")
-          Left(error)
-        },
-        entity => newList(resultSet, newEntity, args) fold (
-          error => Left(error),
-          list => Right(entity :: list) //
-        ) //
-      )
-    } else {
-      Right(Nil)
+  final def newList[T](resultSet: ResultSet, newEntity: (ResultSet, Map[String, String]) => Either[String, T], args: Map[String, String]): List[T] = {
+    @tailrec
+    def newList[P](resultSet: ResultSet, newEntity: (ResultSet, Map[String, String]) => Either[String, P], args: Map[String, String], list: List[P]): List[P] = {
+      if (resultSet.next()) {
+        val list2 = newEntity(resultSet, args) fold (
+          error => {
+            logger.error(s"newList() - $error")
+            list
+          },
+          entity => entity :: list //
+        )
+        newList(resultSet, newEntity, args, list2)
+      } else {
+        list
+      }
     }
+
+    newList(resultSet, newEntity, args, List[T]())
   }
 
 }

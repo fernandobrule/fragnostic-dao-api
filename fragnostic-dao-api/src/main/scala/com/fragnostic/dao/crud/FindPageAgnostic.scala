@@ -1,10 +1,10 @@
 package com.fragnostic.dao.crud
 
 import com.fragnostic.dao.glue.Page
+import com.fragnostic.dao.support._
+import org.slf4j.{ Logger, LoggerFactory }
 
 import java.sql.{ Connection, PreparedStatement, ResultSet, SQLException }
-import com.fragnostic.dao.support.{ ConnectionAgnostic, PageSupport, PreparedStatementParamsSupport, PreparedStatementSupport, SqlOrderBySupport, SqlWhereSupport }
-import org.slf4j.{ Logger, LoggerFactory }
 
 /**
  * Created by Fernando Brule on 30-06-2015 22:23:00.

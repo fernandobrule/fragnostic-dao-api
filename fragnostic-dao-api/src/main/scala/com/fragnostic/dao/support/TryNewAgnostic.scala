@@ -1,7 +1,6 @@
 package com.fragnostic.dao.support
 
 import java.sql.ResultSet
-
 import scala.util.Try
 
 /**

@@ -1,9 +1,9 @@
 package com.fragnostic.dao.crud
 
-import java.sql.{ Connection, PreparedStatement, ResultSet }
-
 import com.fragnostic.dao.support.{ ConnectionAgnostic, PreparedStatementSupport, RecursionSupport }
 import org.slf4j.{ Logger, LoggerFactory }
+
+import java.sql.{ Connection, PreparedStatement, ResultSet }
 
 /**
  * Created by fernandobrule on 8/20/16.
@@ -20,7 +20,7 @@ trait FindListByAgnostic extends ConnectionAgnostic with PreparedStatementSuppor
     sqlFindListBy: String,
     filloutPsFindListBy: (PreparedStatement, P) => Either[String, PreparedStatement],
     newEntity: (ResultSet, Map[String, String]) => Either[String, T],
-    args: Map[String, String] = Map.empty): Either[String, List[T]] =
+    args: Map[String, String] = Map.empty): Either[String, List[T]] = {
     getConnection map (
       connection =>
         findListBy(
@@ -37,7 +37,10 @@ trait FindListByAgnostic extends ConnectionAgnostic with PreparedStatementSuppor
           list => {
             closeWithoutCommit(connection)
             Right(list)
-          })) getOrElse Left("find.by.agnostic.error.no.db.connection")
+          } //
+        ) //
+    ) getOrElse Left("find.by.agnostic.error.no.db.connection")
+  }
 
   //
   // Find List By Id
@@ -72,16 +75,12 @@ trait FindListByAgnostic extends ConnectionAgnostic with PreparedStatementSuppor
                 Left(s"find.list.by.agnostic.error.on.exec.query")
               },
               resultSet => {
-                newList(resultSet, newEntity, args) fold (
-                  error => {
-                    logger.error(s"findListBy() - $error")
-                    close(resultSet, prepStat)
-                    Left(error)
-                  },
-                  list => {
-                    close(resultSet, prepStat)
-                    Right(list)
-                  })
-              })))
+                close(resultSet, prepStat)
+                Right(newList(resultSet, newEntity, args))
+
+              } //
+            ) //
+        ) //
+    )
 
 }
