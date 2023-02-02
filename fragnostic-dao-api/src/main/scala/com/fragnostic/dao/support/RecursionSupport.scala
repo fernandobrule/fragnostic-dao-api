@@ -25,7 +25,7 @@ trait RecursionSupport {
         )
         newList(resultSet, newEntity, args, list2)
       } else {
-        list
+        list.reverse
       }
     }
 
