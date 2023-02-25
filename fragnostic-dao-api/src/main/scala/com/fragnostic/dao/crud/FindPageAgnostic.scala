@@ -25,10 +25,11 @@ trait FindPageAgnostic extends ConnectionAgnostic with PreparedStatementSupport 
     mapNickToRealColumns: List[(String, String, String, String)],
     prmsCount: Map[Int, (String, String)],
     prmsPage: Map[Int, (String, String)],
-    sqlCountTotalRows: String,
-    sqlFindPage: String,
-    newRow: (ResultSet, Map[String, String]) => Either[String, P],
-    args: Map[String, String] = Map.empty): Either[String, Page[P]] = {
+    sqlCountTotalRows: String, // to get total rows
+    sqlFindPage: String, // to get a page with all his columns
+    newRow: (ResultSet, Map[String, String]) => Either[String, P], // P new instance
+    args: Map[String, String] = Map.empty // args for P new instance
+  ): Either[String, Page[P]] = {
     getConnection map (connection => {
       val eith = validate(connection, numPage, numMaxBadgets, rowsPerPg, orderDescFlag, orderCriterion, orderAvailable, mapNickToArgs, mapNickToRealColumns, prmsCount, prmsPage, sqlCountTotalRows, sqlFindPage, newRow, args)
       closeWithoutCommit(connection)
@@ -54,7 +55,7 @@ trait FindPageAgnostic extends ConnectionAgnostic with PreparedStatementSupport 
     args: Map[String, String]): Either[String, Page[P]] = {
     validate(connection, numPage, numMaxBadgets, rowsPerPg, orderDesc, orderReq, orderAvailable, mapNickToArgs, mapNickToRealColumns, prmsCount, prmsPage, sqlCountTotalRows, sqlFindPage, newRow, args)
   }
-  //connection, numPage, numMaxBadgets, rowsPerPg, orderDescFlag, orderCriterion, orderAvailable, mapNickToArgs, mapNickToRealColumns, prmsCount, prmsPage, sqlCountTotalRows, sqlFindPage, newRow, args
+
   private def validate[P](
     connection: Connection,
     numPage: Int,

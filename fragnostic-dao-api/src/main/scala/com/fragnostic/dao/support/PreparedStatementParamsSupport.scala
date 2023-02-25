@@ -2,7 +2,7 @@ package com.fragnostic.dao.support
 
 import org.slf4j.{ Logger, LoggerFactory }
 
-import java.sql.{ PreparedStatement, SQLException }
+import java.sql.PreparedStatement
 
 /**
  * Created by fernandobrule on 12/3/15.
@@ -13,10 +13,8 @@ trait PreparedStatementParamsSupport extends StatementTypeHandler {
 
   private val OK = "OK"
 
-  def setParams(
-    prmsCount: Map[Int, (String, String)],
-    prepStat: PreparedStatement): Either[List[String], Int] = {
-
+  def setParams(prmsCount: Map[Int, (String, String)], prepStat: PreparedStatement): Either[List[String], Int] = {
+    //logger.info(s"setParams() - enter, prmsCount[${prmsCount}]")
     val errors = handleIterator(
       prmsCount.keysIterator,
       prmsCount,
@@ -38,9 +36,10 @@ trait PreparedStatementParamsSupport extends StatementTypeHandler {
     numParam: Int,
     prmsCount: Map[Int, (String, String)],
     prepStat: PreparedStatement): String = {
-    handle(prmsCount(numParam)._1) fold (
+    //logger.info(s"handleNumParam() - enter, numParam[$numParam]")
+    getHandler(prmsCount(numParam)._1) fold (
       error => {
-        logger.error(s"handleNumParam | $error")
+        logger.error(s"handleNumParam() - ${error}")
         error
       },
       handler =>
@@ -48,22 +47,21 @@ trait PreparedStatementParamsSupport extends StatementTypeHandler {
           handler(prepStat, numParam, prmsCount)
           OK
         } catch {
-          case e: SQLException =>
-            logger.error(s"handleNumParam | $e")
-            s"$e"
           case e: Exception =>
-            logger.error(s"handleNumParam | $e")
+            logger.error(s"handleNumParam() - ${e.getClass.getName} - ${e.getMessage}")
             s"$e"
           case e: Throwable =>
-            logger.error(s"handleNumParam | $e")
+            logger.error(s"handleNumParam() - ${e.getClass.getName} - ${e.getMessage}")
             s"$e"
-        })
+        } //
+    )
   }
 
   private def handleIterator(
     iterator: Iterator[Int],
     prmsCount: Map[Int, (String, String)],
     prepStat: PreparedStatement): List[String] = {
+    //logger.info(s"handleIterator() - enter")
     if (iterator.hasNext) {
       handleNumParam(iterator.next(), prmsCount, prepStat) :: handleIterator(
         iterator,

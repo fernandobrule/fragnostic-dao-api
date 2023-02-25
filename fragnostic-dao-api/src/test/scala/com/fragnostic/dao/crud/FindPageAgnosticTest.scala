@@ -33,20 +33,31 @@ class FindPageAgnosticTest extends DaoLifeCycleSupport with FindPageAgnostic {
       val mapNickToRealColumns: List[(String, String, String, String)] = List( //
       )
 
-      val prmsCount: Map[Int, (String, String)] = Map.empty
-      val prmsPage: Map[Int, (String, String)] = Map.empty
+      val prmsCount: Map[Int, (String, String)] = Map(1 -> ("String", "four"))
+      val prmsPage: Map[Int, (String, String)] = Map(1 -> ("String", "four"))
 
       val sqlCountTotalRows: String =
         s"""
-          | select count(*) as total_rows from $dbSchema.dummy1
+          | select count(*) as total_rows
+          | from $dbSchema.dummy1
+          | where dummy1_field3 = ?
+          |
           |""".stripMargin
 
       val sqlFindPage: String =
         s"""
           |
           | select
-          |   dummy1_id, dummy1_field1, dummy1_field2
-          | from $dbSchema.dummy1 order by dummy1_field2
+          |   dummy1_id,
+          |   dummy1_field1,
+          |   dummy1_field2,
+          |   dummy1_field3
+          | from
+          |   $dbSchema.dummy1
+          | where
+          |   dummy1_field3 = ?
+          | order by
+          |   dummy1_field2
           | limit ?, ?
           |
           |""".stripMargin
@@ -56,7 +67,8 @@ class FindPageAgnosticTest extends DaoLifeCycleSupport with FindPageAgnostic {
           Dummy( //
             rs.getLong("dummy1_id"),
             rs.getString("dummy1_field1"),
-            rs.getString("dummy1_field2") //
+            rs.getString("dummy1_field2"),
+            rs.getString("dummy1_field3") //
           ) //
         ) match {
             case Success(dummy) => Right(dummy)
@@ -88,6 +100,8 @@ class FindPageAgnosticTest extends DaoLifeCycleSupport with FindPageAgnostic {
 
       assertResult(1)(page.numPage)
       assertResult(true)(page.list.nonEmpty)
+
+      page.list.foreach(println(_))
 
     }
 
