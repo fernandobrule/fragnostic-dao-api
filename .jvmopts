@@ -5,6 +5,5 @@
 -XX:+UseG1GC
 -XX:ReservedCodeCacheSize=128m
 -Djava.awt.headless=true
--XX:+CMSClassUnloadingEnabled
 -Dsbt.io.implicit.relative.glob.conversion=allow
 -Dapp.name=fatBackend
