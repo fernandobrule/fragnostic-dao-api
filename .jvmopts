@@ -6,4 +6,4 @@
 -XX:ReservedCodeCacheSize=128m
 -Djava.awt.headless=true
 -Dsbt.io.implicit.relative.glob.conversion=allow
--Dapp.name=fatBackend
+-Dapp.name=fragnosticDaoApi

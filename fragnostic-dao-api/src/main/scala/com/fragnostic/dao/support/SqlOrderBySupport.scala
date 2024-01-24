@@ -13,12 +13,12 @@ trait SqlOrderBySupport {
 
   def normalize(mapNickToArgs: Map[String, String], orderCriterion: String): String =
     if (orderCriterion.trim.isEmpty) {
-      logger.warn(s"normalize() - the key to look in orderByMap is empty")
+      logger.warn(s"normalize() - orderCriterion is empty")
       ""
     } else if (mapNickToArgs.contains(orderCriterion.trim)) {
       orderCriterion.trim
     } else {
-      logger.warn(s"normalize() - orderByMap does not contains key [${orderCriterion.trim}]")
+      logger.warn(s"normalize() - mapNickToArgs[${mapNickToArgs.mkString}] does not contains orderCriterion[${orderCriterion.trim}]")
       ""
     }
 

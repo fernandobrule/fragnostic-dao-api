@@ -1,5 +1,5 @@
 #!/bin/bash
 
-source ./environment
+source ./environment.sh
 
 ./sbt -v -213

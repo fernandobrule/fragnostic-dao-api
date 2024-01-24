@@ -14,7 +14,13 @@ trait DaoLifeCycleSupport extends AnyFunSpec with ConnectionAgnostic with Before
 
   private[this] val logger: Logger = LoggerFactory.getLogger("DaoLifeCycleSupport")
 
-  val dataSource: MysqlDataSource = CakeDaoMySql.mysql8DataSource.getDataSource fold (
+  val host: String = "FRG_DAO_API_DATASOURCE_HOST"
+  val port: String = "FRG_DAO_API_DATASOURCE_PORT"
+  val db: String = "FRG_DAO_API_DATASOURCE_DB"
+  val usr: String = "FRG_DAO_API_DATASOURCE_USR"
+  val psw: String = "FRG_DAO_API_DATASOURCE_PSW"
+
+  val dataSource: MysqlDataSource = CakeDaoMySql.mysql8DataSource.getDataSource(host, port, db, usr, psw) fold (
     error => {
       logger.error(s"On get DataSource: $error")
       throw new IllegalStateException(error)

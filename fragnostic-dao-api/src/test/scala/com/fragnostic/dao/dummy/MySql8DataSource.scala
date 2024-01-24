@@ -17,19 +17,31 @@ trait MySql8DataSource extends DataSourceApi {
     // https://dev.mysql.com/doc/connector-j/8.0/en/connector-j-reference-configuration-properties.html
     // https://tersesystems.com/blog/2012/12/27/error-handling-in-scala/
     //
-    private val getConfig: Either[String, (String, Int, String, String, String)] =
+    private def getConfig(
+      host: String,
+      port: String,
+      db: String,
+      usr: String,
+      psw: String //
+    ): Either[String, (String, Int, String, String, String)] =
       for {
-        host <- CakeConfEnvService.confEnvService.getString("DATASOURCE_HOST")
-        port <- CakeConfEnvService.confEnvService.getInt("DATASOURCE_PORT")
-        db <- CakeConfEnvService.confEnvService.getString("DATASOURCE_DB")
-        usr <- CakeConfEnvService.confEnvService.getString("DATASOURCE_USR")
-        psw <- CakeConfEnvService.confEnvService.getString("DATASOURCE_PSW")
+        host <- CakeConfEnvService.confEnvService.getString(host)
+        port <- CakeConfEnvService.confEnvService.getInt(port)
+        db <- CakeConfEnvService.confEnvService.getString(db)
+        usr <- CakeConfEnvService.confEnvService.getString(usr)
+        psw <- CakeConfEnvService.confEnvService.getString(psw)
       } yield {
         (host, port, db, usr, psw)
       }
 
-    override def getDataSource: Either[String, MysqlDataSource] = {
-      getConfig fold (
+    override def getDataSource(
+      host: String,
+      port: String,
+      db: String,
+      usr: String,
+      psw: String //
+    ): Either[String, MysqlDataSource] = {
+      getConfig(host, port, db, usr, psw) fold (
         error => Left(error),
         config => {
           val mysqlDataSource: MysqlDataSource = new MysqlDataSource()

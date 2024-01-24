@@ -14,7 +14,7 @@ class FindPageAgnosticTest extends DaoLifeCycleSupport with FindPageAgnostic {
 
     it("Can Get Page") {
 
-      val dbSchema = CakeConfEnvService.confEnvService.getString("DATASOURCE_DB") fold (
+      val dbSchema = CakeConfEnvService.confEnvService.getString("FRG_DAO_API_DATASOURCE_DB") fold (
         error => throw new IllegalStateException(error),
         dbSchema => dbSchema //
       )
