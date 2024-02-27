@@ -1,4 +1,5 @@
 
-drop database if exists dbmysqlimpltest;
+use mysql;
 
-create database if not exists dbmysqlimpltest;
+drop database if exists ${db.name};
+create database if not exists ${db.name};

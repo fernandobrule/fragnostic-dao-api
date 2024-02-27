@@ -1,24 +1,24 @@
 package com.fragnostic.dao.crud
 
-import java.sql.{ Connection, ResultSet }
-
 import com.fragnostic.dao.support.{ ConnectionAgnostic, PreparedStatementSupport, RecursionSupport }
 import org.slf4j.{ Logger, LoggerFactory }
+
+import java.sql.{ Connection, ResultSet }
 
 /**
  * Created by fernandobrule on 7/21/16.
  */
 trait FindListAgnostic extends ConnectionAgnostic with PreparedStatementSupport with RecursionSupport {
 
-  private[this] val logger: Logger = LoggerFactory.getLogger(getClass.getName)
+  private[this] val logger: Logger = LoggerFactory.getLogger("FindListAgnostic")
 
   //
   // Find List By Id
   //
   def findList[T](
     sqlFindListBy: String,
-    newEntity: (ResultSet, Seq[String]) => Either[String, T],
-    args: Seq[String] = Nil): Either[String, List[T]] =
+    newEntity: (ResultSet, Map[String, String]) => Either[String, T],
+    args: Map[String, String] = Map.empty): Either[String, List[T]] = {
     getConnection map (
       connection => findList(connection, sqlFindListBy, newEntity, args) fold (
         error => {
@@ -28,7 +28,10 @@ trait FindListAgnostic extends ConnectionAgnostic with PreparedStatementSupport 
         list => {
           closeWithoutCommit(connection)
           Right(list)
-        })) getOrElse Left("find.by.agnostic.error.no.db.connection")
+        } //
+      ) //
+    ) getOrElse Left("find.by.agnostic.error.no.db.connection") //
+  }
 
   //
   // Find List By Id
@@ -36,8 +39,8 @@ trait FindListAgnostic extends ConnectionAgnostic with PreparedStatementSupport 
   def findList[T](
     connection: Connection,
     sqlFindListBy: String,
-    newEntity: (ResultSet, Seq[String]) => Either[String, T],
-    args: Seq[String]): Either[String, List[T]] =
+    newEntity: (ResultSet, Map[String, String]) => Either[String, T],
+    args: Map[String, String]): Either[String, List[T]] = {
     prepareStatement(connection, sqlFindListBy) fold (
       error => {
         logger.error(
@@ -53,16 +56,12 @@ trait FindListAgnostic extends ConnectionAgnostic with PreparedStatementSupport 
             Left(s"find.list.by.agnostic.error.on.exec.query")
           },
           resultSet => {
-            newList(resultSet, newEntity, args) fold (
-              error => {
-                logger.error(s"findList() - $error")
-                close(resultSet, prepStat)
-                Left(error)
-              },
-              list => {
-                close(resultSet, prepStat)
-                Right(list)
-              })
-          }))
+
+            Right(newList(resultSet, newEntity, args))
+
+          } //
+        ) //
+    )
+  }
 
 }

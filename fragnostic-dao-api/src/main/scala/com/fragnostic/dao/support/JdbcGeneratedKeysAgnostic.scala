@@ -1,8 +1,8 @@
 package com.fragnostic.dao.support
 
-import java.sql.{ PreparedStatement, ResultSet }
-
 import org.slf4j.{ Logger, LoggerFactory }
+
+import java.sql.{ PreparedStatement, ResultSet }
 
 /**
  * Created by Fernando Brule on 30-06-2015 22:23:00.
@@ -10,13 +10,13 @@ import org.slf4j.{ Logger, LoggerFactory }
  */
 trait JdbcGeneratedKeysAgnostic extends CloseResourceAgnostic {
 
-  private[this] val logger: Logger = LoggerFactory.getLogger(getClass.getName)
+  private[this] val logger: Logger = LoggerFactory.getLogger("JdbcGeneratedKeysAgnostic")
 
-  def getLongGenKey(prepStat: PreparedStatement, args: Seq[String]): Option[Long] =
+  def getLongGenKey(prepStat: PreparedStatement, args: Map[String, String]): Option[Long] =
     getGenKey[Long](
       prepStat,
       args,
-      (resultSet: ResultSet, args: Seq[String]) => try {
+      (resultSet: ResultSet, args: Map[String, String]) => try {
         Right(resultSet.getLong(1))
       } catch {
         case e: Exception =>
@@ -26,8 +26,8 @@ trait JdbcGeneratedKeysAgnostic extends CloseResourceAgnostic {
 
   def getGenKey[T](
     prepStat: PreparedStatement,
-    args: Seq[String],
-    resultSetExtract: (ResultSet, Seq[String]) => Either[String, T]): Option[T] = {
+    args: Map[String, String],
+    resultSetExtract: (ResultSet, Map[String, String]) => Either[String, T]): Option[T] = {
     val resultSet = prepStat.getGeneratedKeys
     resultSet.next()
     resultSetExtract(resultSet, args) fold (
@@ -42,11 +42,11 @@ trait JdbcGeneratedKeysAgnostic extends CloseResourceAgnostic {
   }
 
   def getIntGenKey(
-    prepStat: PreparedStatement, args: Seq[String]): Option[Int] =
+    prepStat: PreparedStatement, args: Map[String, String]): Option[Int] =
     getGenKey[Int](
       prepStat,
       args,
-      (resultSet: ResultSet, args: Seq[String]) => try {
+      (resultSet: ResultSet, args: Map[String, String]) => try {
         Right(resultSet.getInt(1))
       } catch {
         case e: Exception =>

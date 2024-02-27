@@ -1,9 +1,8 @@
 package com.fragnostic.dao.crud
 
-import java.sql.Connection
-
 import com.fragnostic.dao.support.{ CloseResourceAgnostic, ConnectionAgnostic, StatementAgnostic }
 
+import java.sql.Connection
 import scala.util.{ Failure, Success, Try }
 
 /**

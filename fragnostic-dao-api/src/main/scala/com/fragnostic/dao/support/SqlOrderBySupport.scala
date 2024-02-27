@@ -9,51 +9,66 @@ import scala.collection.mutable.ListBuffer
  */
 trait SqlOrderBySupport {
 
-  private[this] val logger: Logger = LoggerFactory.getLogger(getClass.getName)
+  private[this] val logger: Logger = LoggerFactory.getLogger("SqlOrderBySupport")
 
-  def normalize(orderByMap: Map[String, String], rawOrderBy: String): String =
-    if (orderByMap.contains(rawOrderBy.trim)) {
-      rawOrderBy.trim
+  def normalize(mapNickToArgs: Map[String, String], orderCriterion: String): String =
+    if (orderCriterion.trim.isEmpty) {
+      logger.warn(s"normalize() - orderCriterion is empty")
+      ""
+    } else if (mapNickToArgs.contains(orderCriterion.trim)) {
+      orderCriterion.trim
     } else {
-      logger.warn(s"""normalize() - "order by map" does not contains key ${rawOrderBy.trim}""")
+      logger.warn(s"normalize() - mapNickToArgs[${mapNickToArgs.mkString}] does not contains orderCriterion[${orderCriterion.trim}]")
       ""
     }
 
-  def applyOrderBy(
-    orderByMap: Map[String, String],
-    rawSql: String,
-    rawOrderBy: String,
-    rawDesc: Boolean): String = {
+  def applyOrderBy( //sqlFindPage, mapNickToArgs, orderCriterion, orderDescFlag
+    sqlFindPage: String,
+    mapNickToArgs: Map[String, String],
+    orderCriterion: String,
+    orderDescFlag: Boolean //
+  ): String = {
 
-    val trimmed = normalize(orderByMap, rawOrderBy)
-    if (trimmed == "") rawSql.replace("{{orderBy}}", "")
+    val trimmed = normalize(mapNickToArgs, orderCriterion)
+    if (trimmed == "") sqlFindPage.replace("{{orderBy}}", "")
     else if (trimmed.indexOf(";") < 0) {
-      if (orderByMap.contains(trimmed))
-        rawSql.replace(
+      if (mapNickToArgs.contains(trimmed))
+        sqlFindPage.replace(
           "{{orderBy}}",
-          s""" order by ${orderByMap(trimmed)} ${desc(rawDesc)}""")
+          s"""order by ${mapNickToArgs(trimmed)}${desc(orderDescFlag)}""" //
+        )
       else
-        rawSql.replace("{{orderBy}}", "")
+        sqlFindPage.replace("{{orderBy}}", "")
     } else {
       val orderByBuffer = new ListBuffer[String]
       trimmed.split(";") foreach (
         order =>
-          if (orderByMap.contains(order) && !orderByBuffer.contains(
-            orderByMap(order))) orderByBuffer += orderByMap(order))
+          if (mapNickToArgs.contains(order) && !orderByBuffer.contains(mapNickToArgs(order))) {
+            orderByBuffer += mapNickToArgs(order)
+          } //
+      )
 
-      if (orderByBuffer.nonEmpty)
-        rawSql.replace(
+      if (orderByBuffer.nonEmpty) {
+        sqlFindPage.replace(
           "{{orderBy}}",
           s""" order by ${
             orderByBuffer.mkString(
               ", ")
-          } ${desc(rawDesc)} """)
-      else
-        rawSql.replace("{{orderBy}}", "")
+          } ${desc(orderDescFlag)} """ //
+        )
+      } else {
+        sqlFindPage.replace("{{orderBy}}", "")
+      }
     }
 
   }
 
-  def desc(rawDesc: Boolean): String = if (rawDesc) " desc " else ""
+  def desc(rawDesc: Boolean): String = {
+    if (rawDesc) {
+      " desc "
+    } else {
+      ""
+    }
+  }
 
 }
