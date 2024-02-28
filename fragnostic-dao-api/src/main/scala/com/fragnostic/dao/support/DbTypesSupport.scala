@@ -1,14 +1,14 @@
 package com.fragnostic.dao.support
 
+import org.slf4j.{ Logger, LoggerFactory }
+
 import java.sql.{ Date, Timestamp }
 import java.text.SimpleDateFormat
 import java.time.ZoneId
 
-import org.slf4j.{ Logger, LoggerFactory }
-
 trait DbTypesSupport {
 
-  private[this] val logger: Logger = LoggerFactory.getLogger(getClass.getName)
+  private[this] val logger: Logger = LoggerFactory.getLogger("DbTypesSupport")
 
   val ptrnStrTst = "dd-MM-yyyy HH:mm:ss"
   val ptrnSqlTst = "dd-MM-yyyy HH:mm:ss"

@@ -1,9 +1,9 @@
 package com.fragnostic.dao.crud
 
-import java.sql.{ Connection, PreparedStatement, ResultSet, Statement }
-
 import com.fragnostic.dao.support.{ ConnectionAgnostic, JdbcGeneratedKeysAgnostic, PreparedStatementSupport }
 import org.slf4j.{ Logger, LoggerFactory }
+
+import java.sql.{ Connection, PreparedStatement, ResultSet, Statement }
 
 /**
  * Created by Fernando Brule on 30-06-2015 22:23:00.
@@ -11,7 +11,7 @@ import org.slf4j.{ Logger, LoggerFactory }
  */
 trait CreateAgnostic extends ConnectionAgnostic with PreparedStatementSupport with JdbcGeneratedKeysAgnostic {
 
-  private[this] val logger: Logger = LoggerFactory.getLogger(getClass.getName)
+  private[this] val logger: Logger = LoggerFactory.getLogger("CreateAgnostic")
 
   //
   // Create
@@ -20,8 +20,8 @@ trait CreateAgnostic extends ConnectionAgnostic with PreparedStatementSupport wi
     createRequest: R,
     sqlCreate: String,
     filloutPsCreate: (PreparedStatement, R) => Either[String, PreparedStatement],
-    resultSetExtractId: (ResultSet, Seq[String]) => Either[String, I],
-    args: Seq[String] = Nil): Either[String, I] =
+    resultSetExtractId: (ResultSet, Map[String, String]) => Either[String, I],
+    args: Map[String, String] = Map.empty): Either[String, I] =
     getConnection map (
       connection =>
         create(
@@ -49,8 +49,8 @@ trait CreateAgnostic extends ConnectionAgnostic with PreparedStatementSupport wi
     createRequest: R,
     sqlCreate: String,
     filloutPsCreate: (PreparedStatement, R) => Either[String, PreparedStatement],
-    resultSetExtractId: (ResultSet, Seq[String]) => Either[String, I],
-    args: Seq[String]): Either[String, I] = {
+    resultSetExtractId: (ResultSet, Map[String, String]) => Either[String, I],
+    args: Map[String, String]): Either[String, I] = {
 
     val prepStat =
       connection.prepareStatement(sqlCreate, Statement.RETURN_GENERATED_KEYS)

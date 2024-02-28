@@ -1,7 +1,6 @@
 package com.fragnostic.dao.support
 
 import java.sql.ResultSet
-
 import scala.util.Try
 
 /**
@@ -10,49 +9,49 @@ import scala.util.Try
  */
 trait ResultSetGetAgnostic {
 
-  def resultSetGetString: (ResultSet, Seq[String]) => Either[String, String] =
-    (resultSet: ResultSet, args: Seq[String]) => try {
+  def resultSetGetString: (ResultSet, Map[String, String]) => Either[String, String] =
+    (resultSet: ResultSet, args: Map[String, String]) => try {
       Right(resultSet.getString(1))
     } catch {
       case e: Exception => Left(e.getMessage)
     }
 
-  def resultSetGetShort: (ResultSet, Seq[String]) => Either[String, Short] = (resultSet: ResultSet, args: Seq[String]) =>
+  def resultSetGetShort: (ResultSet, Map[String, String]) => Either[String, Short] = (resultSet: ResultSet, args: Map[String, String]) =>
     try {
       Right(resultSet.getShort(1))
     } catch {
       case e: Exception => Left(e.getMessage)
     }
 
-  def resultSetGetInt: (ResultSet, Seq[String]) => Either[String, Int] = (resultSet: ResultSet, args: Seq[String]) =>
+  def resultSetGetInt: (ResultSet, Map[String, String]) => Either[String, Int] = (resultSet: ResultSet, args: Map[String, String]) =>
     try {
       Right(resultSet.getInt(1))
     } catch {
       case e: Exception => Left(e.getMessage)
     }
 
-  def resultSetGetLong: (ResultSet, Seq[String]) => Either[String, Long] = (resultSet: ResultSet, args: Seq[String]) =>
+  def resultSetGetLong: (ResultSet, Map[String, String]) => Either[String, Long] = (resultSet: ResultSet, args: Map[String, String]) =>
     try {
       Right(resultSet.getLong(1))
     } catch {
       case e: Exception => Left(e.getMessage)
     }
 
-  def resultSetGetLongLong: (ResultSet, Seq[String]) => Either[String, (Long, Long)] = (resultSet: ResultSet, args: Seq[String]) =>
+  def resultSetGetLongLong: (ResultSet, Map[String, String]) => Either[String, (Long, Long)] = (resultSet: ResultSet, args: Map[String, String]) =>
     try {
       Right((resultSet.getLong(1), resultSet.getLong(2)))
     } catch {
       case e: Exception => Left(e.getMessage)
     }
 
-  def resultSetGetDouble: (ResultSet, Seq[String]) => Either[String, Double] = (resultSet: ResultSet, args: Seq[String]) =>
+  def resultSetGetDouble: (ResultSet, Map[String, String]) => Either[String, Double] = (resultSet: ResultSet, args: Map[String, String]) =>
     try {
       Right(resultSet.getDouble(1))
     } catch {
       case e: Exception => Left(e.getMessage)
     }
 
-  def resultSetGetBigDecimal: (ResultSet, Seq[String]) => Either[String, BigDecimal] = (resultSet: ResultSet, args: Seq[String]) =>
+  def resultSetGetBigDecimal: (ResultSet, Map[String, String]) => Either[String, BigDecimal] = (resultSet: ResultSet, args: Map[String, String]) =>
     try {
       Right(resultSet.getBigDecimal(1))
     } catch {

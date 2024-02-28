@@ -5,43 +5,53 @@ import Dependencies._
 
 val unusedOptions = Seq("-Ywarn-unused:imports")
 
-lazy val fragnosticSettings = Seq(
+val scala3migaration = Def.settings(
+  scalacOptions ++= {
+    if (scalaBinaryVersion.value == "3") {
+      Seq(
+        "-source:3.0-migration",
+      )
+    } else {
+      Nil
+    }
+  }
+)
+
+lazy val fragnosticDaoApiSettings = Seq(
   organization := "com.fragnostic",
+  //logLevel := Level.Error,
   Test / fork := true,
   Test / baseDirectory := (ThisBuild / baseDirectory).value,
-  crossScalaVersions := Seq("2.12.15", "2.13.7", "3.1.1-RC2"),
+  crossScalaVersions := Seq("2.12.18", "2.13.10", "2.13.11", "2.13.12", "3.3.0"),
   scalaVersion := crossScalaVersions.value.head,
-  libraryDependencySchemes += "org.scala-lang.modules" %% "scala-xml" % "always",
-  allDependencies := {
-    val values = allDependencies.value
-    // workaround for
-    // "Modules were resolved with conflicting cross-version suffixes"
-    // "   org.scala-lang.modules:scala-xml _3.0.0-RC1, _2.13"
-    CrossVersion.partialVersion(scalaVersion.value) match {
-      case Some((3, _)) =>
-        values.map(
-          _.exclude("org.scala-lang.modules", "scala-xml_2.13")
-            .exclude("org.scala-lang.modules", "scala-parser-combinators_2.13")
-        )
-      case _ =>
-        values
+  Test / testOptions ++= {
+    if (scalaBinaryVersion.value == "3") {
+      Seq(
+        Tests.Exclude(Set(
+          //"org.scalatra.swagger.ModelSpec",
+          //"org.scalatra.swagger.SwaggerSpec2",
+        )),
+      )
+    } else {
+      Nil
     }
   },
   scalacOptions ++= {
     CrossVersion.partialVersion(scalaVersion.value) match {
       case Some((2, _)) =>
         unusedOptions ++ Seq(
-          "-target:jvm-1.8",
+          "-release:8",
           "-Xlint",
           "-Xcheckinit",
         )
       case _ =>
-        Seq(
-          "-source",
-          "3.0-migration",
-        )
+        Nil
     }
   },
+  javacOptions ++= Seq(
+    "-source", "11",
+    "-target", "11",
+  ),
   scalacOptions ++= Seq(
     "-unchecked",
     "-deprecation",
@@ -53,8 +63,41 @@ lazy val fragnosticSettings = Seq(
     "-language:existentials"
   ),
   manifestSetting,
-) ++ Seq(Compile, Test).flatMap(c =>
+) ++ mavenCentralFrouFrou ++ Seq(Compile, Test).flatMap(c =>
   c / console / scalacOptions --= unusedOptions
+)
+
+lazy val fragnosticDaoApiProject = Project(
+  id = "fragnostic-dao-api-project",
+  base = file(".")).settings(
+    fragnosticDaoApiSettings ++ Seq(
+    name := "fragnostic-dao-api",
+    artifacts := Classpaths.artifactDefs(Seq(Compile / packageDoc, Compile / makePom)).value,
+    packagedArtifacts := Classpaths.packaged(Seq(Compile / packageDoc, Compile / makePom)).value,
+    description := "fragnostic-dao-api",
+    shellPrompt := { state =>
+      s"sbt:${Project.extract(state).currentProject.id}" + Def.withColor("> ", Option(scala.Console.CYAN))
+    }
+  ) ++ Defaults.packageTaskSettings(
+    Compile / packageDoc, (Compile / unidoc).map(_.flatMap(Path.allSubpaths))
+  )).aggregate(
+    fragnosticDaoApi
+  ).enablePlugins(ScalaUnidocPlugin)
+
+lazy val fragnosticDaoApi = Project(
+  id = "fragnostic-dao-api",
+  base = file("fragnostic-dao-api")).settings(fragnosticDaoApiSettings ++ Seq(
+    libraryDependencies ++= Seq(
+      logbackClassic,
+      scalatestFunSpec,
+      mysql8JavaClient,
+      fragnosticConfEnv,
+      fragnosticSupport
+    ),
+    description := "fragnostic-dao-api"
+  )
+) dependsOn(
+  //
 )
 
 lazy val manifestSetting = packageOptions += {
@@ -72,36 +115,25 @@ lazy val manifestSetting = packageOptions += {
   )
 }
 
+// Things we care about primarily because Maven Central demands them
+lazy val mavenCentralFrouFrou = Seq(
+  homepage := Some(url("http://www.okl.org/")),
+  startYear := Some(2022),
+  licenses := Seq(("BSD", url("http://github.com/okl/okl/raw/HEAD/LICENSE"))),
+  pomExtra := pomExtra.value ++ Group(
+    <scm>
+      <url>http://github.com/okl/okl</url>
+      <connection>scm:git:git://github.com/okl/okl.git</connection>
+    </scm>
+    <developers>
+      <developer>
+        <id>fbrule</id>
+        <name>Fernando Brule</name>
+        <url>http://www.fbrule.info</url>
+      </developer>      
+    </developers>
+  )
+)
+
 lazy val doNotPublish = Seq(publish := {}, publishLocal := {}, PgpKeys.publishSigned := {}, PgpKeys.publishLocalSigned := {})
 
-lazy val fragnosticDaoApiProject = Project(
-  id = "fragnostic-dao-api-project",
-  base = file(".")).settings(
-  fragnosticSettings ++ Seq(
-    name := "fragnostic dao api project",
-    artifacts := Classpaths.artifactDefs(Seq(Compile / packageDoc, Compile / makePom)).value,
-    packagedArtifacts := Classpaths.packaged(Seq(Compile / packageDoc, Compile / makePom)).value,
-    description := "A Fragnostic Dao Api",
-    shellPrompt := { state =>
-      s"sbt:${Project.extract(state).currentProject.id}" + Def.withColor("> ", Option(scala.Console.CYAN))
-    }
-  )).aggregate(
-  fragnosticDaoApi,
-).enablePlugins()
-
-lazy val fragnosticDaoApi = Project(
-  id = "fragnostic-dao-api",
-  base = file("fragnostic-dao-api")).settings(fragnosticSettings ++ Seq(
-  libraryDependencies ++= Seq(
-    logbackClassic,
-    slf4jApi,
-    scalatestFunSpec,
-    mysql8JavaClient,
-    fragnosticConfEnv,
-    fragnosticSupport
-  ),
-  description := "fragnostic dao api"
-)
-) dependsOn(
-  // maybe
-)

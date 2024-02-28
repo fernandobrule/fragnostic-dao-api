@@ -1,8 +1,8 @@
 package com.fragnostic.dao.support
 
-import java.sql._
-
 import org.slf4j.{ Logger, LoggerFactory }
+
+import java.sql._
 
 /**
  * Created by Fernando Brule on 30-06-2015 22:23:00.
@@ -10,7 +10,7 @@ import org.slf4j.{ Logger, LoggerFactory }
  */
 trait CloseResourceAgnostic {
 
-  private[this] val logger: Logger = LoggerFactory.getLogger(getClass.getName)
+  private[this] val logger: Logger = LoggerFactory.getLogger("CloseResourceAgnostic")
 
   def closeWithoutCommit(connection: Connection): Unit =
     try {

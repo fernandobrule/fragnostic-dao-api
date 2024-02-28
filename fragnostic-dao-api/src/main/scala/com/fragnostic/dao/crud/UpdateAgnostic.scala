@@ -1,10 +1,9 @@
 package com.fragnostic.dao.crud
 
-import java.sql.{ Connection, PreparedStatement }
-
 import com.fragnostic.dao.support.{ CloseResourceAgnostic, ConnectionAgnostic, StatementAgnostic }
 import org.slf4j.{ Logger, LoggerFactory }
 
+import java.sql.{ Connection, PreparedStatement }
 import scala.util.Try
 
 /**
@@ -13,7 +12,7 @@ import scala.util.Try
  */
 trait UpdateAgnostic extends CloseResourceAgnostic with ConnectionAgnostic with StatementAgnostic {
 
-  private[this] val logger: Logger = LoggerFactory.getLogger(getClass.getName)
+  private[this] val logger: Logger = LoggerFactory.getLogger("UpdateAgnostic")
 
   //
   // Update

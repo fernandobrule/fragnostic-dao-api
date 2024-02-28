@@ -1,11 +1,7 @@
 #!/bin/bash
 
-export IP_DB=localhost
-echo "      IP_DB : $IP_DB"
+ACTUAL_DIR=$(pwd)
 
-export IP_HOST=localhost
-echo "    IP_HOST : $IP_HOST"
-echo ""
+source $ACTUAL_DIR/fragnostic-dao-api/src/test/resources/common
 
-ant -f ./fragnostic-dao-api/src/test/resources/afterall/build-afterall.xml afterall
-
+/opt/ant/ant/bin/ant -q -f $ACTUAL_DIR/fragnostic-dao-api/src/test/resources/afterall/build-afterall.xml afterall

@@ -8,7 +8,13 @@ trait DataSourceApi {
 
   trait DataSourceApi {
 
-    def getDataSource: Either[String, DataSource]
+    def getDataSource(
+      host: String,
+      port: String,
+      db: String,
+      usr: String,
+      psw: String //
+    ): Either[String, DataSource]
 
   }
 

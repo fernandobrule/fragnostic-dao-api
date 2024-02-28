@@ -1,10 +1,9 @@
 package com.fragnostic.dao.crud
 
-import java.sql.{ Connection, PreparedStatement }
-
 import com.fragnostic.dao.support.{ ConnectionAgnostic, PreparedStatementSupport }
 import org.slf4j.{ Logger, LoggerFactory }
 
+import java.sql.{ Connection, PreparedStatement }
 import scala.util.Try
 
 /**
@@ -13,7 +12,7 @@ import scala.util.Try
  */
 trait DeleteByIdAgnostic extends ConnectionAgnostic with PreparedStatementSupport {
 
-  private[this] val logger: Logger = LoggerFactory.getLogger(getClass.getName)
+  private[this] val logger: Logger = LoggerFactory.getLogger("DeleteByIdAgnostic")
 
   //
   // Delete by Id

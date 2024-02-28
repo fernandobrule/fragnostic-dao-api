@@ -1,9 +1,9 @@
 package com.fragnostic.dao.crud
 
-import java.sql.{ Connection, PreparedStatement, ResultSet }
-
 import com.fragnostic.dao.support.{ ConnectionAgnostic, PreparedStatementSupport }
 import org.slf4j.{ Logger, LoggerFactory }
+
+import java.sql.{ Connection, PreparedStatement, ResultSet }
 
 /**
  * Created by Fernando Brule on 30-06-2015 22:23:00.
@@ -11,7 +11,7 @@ import org.slf4j.{ Logger, LoggerFactory }
  */
 trait FindByIdAgnostic extends ConnectionAgnostic with PreparedStatementSupport {
 
-  private[this] val logger: Logger = LoggerFactory.getLogger(getClass.getName)
+  private[this] val logger: Logger = LoggerFactory.getLogger("FindByIdAgnostic")
 
   //
   // Find By Id
@@ -20,8 +20,8 @@ trait FindByIdAgnostic extends ConnectionAgnostic with PreparedStatementSupport 
     entityId: I,
     sqlFindById: String,
     filloutPsFindById: (PreparedStatement, I) => Either[String, PreparedStatement],
-    newEntity: (ResultSet, Seq[String]) => Either[String, T],
-    args: Seq[String] = Nil): Either[String, Option[T]] =
+    newEntity: (ResultSet, Map[String, String]) => Either[String, T],
+    args: Map[String, String] = Map.empty): Either[String, Option[T]] =
     getConnection map (connection =>
       findById(
         connection,
@@ -47,8 +47,8 @@ trait FindByIdAgnostic extends ConnectionAgnostic with PreparedStatementSupport 
     entityId: I,
     sqlFindById: String,
     filloutPsFindById: (PreparedStatement, I) => Either[String, PreparedStatement],
-    newEntity: (ResultSet, Seq[String]) => Either[String, T],
-    args: Seq[String]): Either[String, Option[T]] = {
+    newEntity: (ResultSet, Map[String, String]) => Either[String, T],
+    args: Map[String, String]): Either[String, Option[T]] = {
 
     val prepStat = connection.prepareStatement(sqlFindById)
     filloutPsFindById(prepStat, entityId) fold (
