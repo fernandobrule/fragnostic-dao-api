@@ -22,7 +22,7 @@ lazy val fragnosticDaoApiSettings = Seq(
   //logLevel := Level.Error,
   Test / fork := true,
   Test / baseDirectory := (ThisBuild / baseDirectory).value,
-  crossScalaVersions := Seq("2.12.18", "2.13.10", "2.13.11", "2.13.12", "3.3.0"),
+  crossScalaVersions := Seq("2.12.18", "2.13.10", "2.13.11", "2.13.12", "2.13.13", "3.3.0"),
   scalaVersion := crossScalaVersions.value.head,
   Test / testOptions ++= {
     if (scalaBinaryVersion.value == "3") {
@@ -88,11 +88,11 @@ lazy val fragnosticDaoApi = Project(
   id = "fragnostic-dao-api",
   base = file("fragnostic-dao-api")).settings(fragnosticDaoApiSettings ++ Seq(
     libraryDependencies ++= Seq(
-      logbackClassic,
-      scalatestFunSpec,
-      mysql8JavaClient,
       fragnosticConfEnv,
-      fragnosticSupport
+      fragnosticSupport,
+      logbackClassic,
+      mysql8JavaClient,
+      scalatestFunSpec
     ),
     description := "fragnostic-dao-api"
   )
@@ -117,13 +117,13 @@ lazy val manifestSetting = packageOptions += {
 
 // Things we care about primarily because Maven Central demands them
 lazy val mavenCentralFrouFrou = Seq(
-  homepage := Some(url("http://www.okl.org/")),
+  homepage := Some(url("http://www.fragnostic-dao-api.org/")),
   startYear := Some(2022),
-  licenses := Seq(("BSD", url("http://github.com/okl/okl/raw/HEAD/LICENSE"))),
+  licenses := Seq(("BSD", url("http://github.com/fragnostic-dao-api/fragnostic-dao-api/raw/HEAD/LICENSE"))),
   pomExtra := pomExtra.value ++ Group(
     <scm>
-      <url>http://github.com/okl/okl</url>
-      <connection>scm:git:git://github.com/okl/okl.git</connection>
+      <url>http://github.com/fragnostic-dao-api/fragnostic-dao-api</url>
+      <connection>scm:git:git://github.com/fragnostic-dao-api/fragnostic-dao-api.git</connection>
     </scm>
     <developers>
       <developer>
